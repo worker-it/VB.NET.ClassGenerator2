@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1000
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "ClassGenerator2", "ClassGenerator2\ClassGenerator2.vbproj", "{BF764EF0-5715-4FC3-B43F-FF35BF6C789D}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "ClassGenerator2Setup", "ClassGenerator2Setup\ClassGenerator2Setup.vdproj", "{AF1DB3CB-700A-4DFC-B967-C86CAED6248A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF764EF0-5715-4FC3-B43F-FF35BF6C789D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF764EF0-5715-4FC3-B43F-FF35BF6C789D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF764EF0-5715-4FC3-B43F-FF35BF6C789D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF764EF0-5715-4FC3-B43F-FF35BF6C789D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF1DB3CB-700A-4DFC-B967-C86CAED6248A}.Debug|Any CPU.ActiveCfg = Debug
+		{AF1DB3CB-700A-4DFC-B967-C86CAED6248A}.Release|Any CPU.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {82A82A36-D099-4254-B508-F93960588892}
+	EndGlobalSection
+EndGlobal

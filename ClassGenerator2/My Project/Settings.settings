@@ -1,0 +1,15 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="" GeneratedClassName="MySettings" UseMySettingsClassName="true">
+  <Profiles />
+  <Settings>
+    <Setting Name="ACCENT_COLOR" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Crimson</Value>
+    </Setting>
+    <Setting Name="APPLICATION_THEME" Type="System.String" Scope="User">
+      <Value Profile="(Default)">BaseDark</Value>
+    </Setting>
+    <Setting Name="NOM_PROGRAMMEUR" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Jean-Claude Frigon</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
