@@ -72,7 +72,7 @@ Public Class DbDatabase
                 Next
                 tbls.Add(New DbTable("Table_" & j, cols, False))
             Next
-            lst.add(New DBschemas( ))
+            lst.add(New DbS)
         Next
 
 
