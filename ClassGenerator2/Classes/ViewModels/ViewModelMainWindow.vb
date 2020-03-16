@@ -1010,7 +1010,7 @@ Public Class ViewModelMainWindow
                         convertedDataType = "Integer"
                     Case "BIT", "BIT VARYING", "BYTEA"
                         convertedDataType = "Byte"
-                    Case "Boolean"
+                    Case "BOOLEAN"
                         convertedDataType = "Boolean"
                     Case "CHARACTER"
                         convertedDataType = "Char"
@@ -1197,7 +1197,7 @@ Public Class ViewModelMainWindow
                         uneClasse &= "#End Region" & vbCrLf
                         uneClasse &= "" & vbCrLf
                         uneClasse &= "Public Class " & leNomDeLaTable.ClassName & vbCrLf
-                        uneClasse &= getNumberTab(1) & "Implements IDisposable" & vbTab & "', INotifyPropertyChanged" & vbCrLf
+                        uneClasse &= getNumberTab(1) & "Implements IDisposable, INotifyPropertyChanged" & vbCrLf
                         uneClasse &= "" & vbCrLf
                         uneClasse &= getNumberTab(1) & " '************************************************************************************" & vbCrLf
                         uneClasse &= getNumberTab(1) & "'                            V  A  R  I  A  B  L  E  S                              *" & vbCrLf
@@ -1542,7 +1542,7 @@ Public Class ViewModelMainWindow
                         uneClasse &= getNumberTab(2) & "''' <summary>" & vbCrLf
                         uneClasse &= getNumberTab(2) & "''' Fonction permettant d'insérer dans la table de la classe l'objet passé en paramètre." & vbCrLf
                         uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
-                        uneClasse &= getNumberTab(2) & "''' <param name=""_" & leNomDeLaTable.TableName & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
+                        uneClasse &= getNumberTab(2) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
                         uneClasse &= getNumberTab(2) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
                         uneClasse &= getNumberTab(1) & "Private Shared Function Insert" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Integer" & vbCrLf
                         uneClasse &= "" & vbCrLf
@@ -2072,10 +2072,18 @@ Public Class ViewModelMainWindow
                         uneClasse &= getNumberTab(2) & "''' Retourne une liste de tous les " & leNomDeLaTable.TableName & " de la table." & vbCrLf
                         uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
                         uneClasse &= getNumberTab(2) & "''' <returns>Retourne une liste de tous les " & leNomDeLaTable.TableName & " de la table</returns>" & vbCrLf
-                        uneClasse &= getNumberTab(1) & "Public Shared Function getAll" & leNomDeLaTable.TableName & "(" & Strings.Right(optionalConnection, optionalConnection.Length - 2) & ") As List(Of " & leNomDeLaTable.ClassName & ")" & vbCrLf
+                        uneClasse &= getNumberTab(1) & "Public Shared Function get" & leNomDeLaTable.TableName & "FromID("
+
+                        For Each col As UneColonne In listeDesColonnes
+                            If (col.IsPrimaryKey) Then
+                                uneClasse &= "Byval _" & col.NomColonneOriginal & " as " & col.TypeDeDonnees & ", "
+                            End If
+                        Next
+
+                        uneClasse &=  Strings.Right(optionalConnection, optionalConnection.Length - 2) & ") As " & leNomDeLaTable.ClassName & vbCrLf
                         uneClasse &= getNumberTab(2) & "" & vbCrLf
 
-                        uneClasse &= getNumberTab(2) & "Dim lst As New List(Of " & leNomDeLaTable.ClassName & ")" & vbCrLf
+                        uneClasse &= getNumberTab(2) & "Dim result As New " & leNomDeLaTable.ClassName &  vbCrLf
                         uneClasse &= getNumberTab(2) & "Dim sqlTables As String" & vbCrLf
                         uneClasse &= getNumberTab(2) & "Dim aConn As DbConnection" & vbCrLf
                         uneClasse &= getNumberTab(2) & "Dim aCommand as DbCommand" & vbCrLf
@@ -2084,7 +2092,25 @@ Public Class ViewModelMainWindow
 
                         'Création de la requête sql      
                         sqlTables = "SELECT * " &
-                                    "FROM " & qryDbName & "." & qryTblName & ";"
+                                    "FROM " & qryDbName & "." & qryTblName & " "
+                        sqlConditions = "WHERE "
+                        For Each col As UneColonne In listeDesColonnes
+
+                            If (col.IsPrimaryKey) Then
+                                sqlConditions &= col.NomColonneOriginal & " = "
+                                Select Case col.TypeDeDonnees
+                                    Case "Long", "Integer", "Byte", "Double", "Decimal"
+                                        sqlConditions &= """ & _" & col.NomColonneOriginal & " & "" AND "
+                                    Case "Char", "DateDate", "String"
+                                        sqlConditions &= "'"" & _" & col.NomColonneOriginal & " & ""' AND "
+                                    Case Else
+                                        sqlConditions &= """ & _" & col.NomColonneOriginal & " & "" AND "
+                                End Select
+                            End If
+
+                        Next
+
+                        sqlTables = sqlTables & Strings.Left(sqlConditions, sqlConditions.Length - 5) & ";"
 
                         Select Case CType(Me.lngTypeBaseDonnees, databaseType)
                             Case databaseType.SQL_SERVER
@@ -2131,23 +2157,19 @@ Public Class ViewModelMainWindow
                         uneClasse &= getNumberTab(2) & "While aDtr.Read()" & vbCrLf
                         uneClasse &= getNumberTab(2) & "" & vbCrLf
 
-                        uneClasse &= getNumberTab(3) & "Dim uneTable as new " & leNomDeLaTable.ClassName & "()" & vbCrLf
-                        uneClasse &= getNumberTab(2) & "" & vbCrLf
-
                         For Each col As UneColonne In listeDesColonnes
 
 
                             If (col Is Nothing) OrElse (col.TypeDeDonnees Is Nothing) OrElse (col.TypeDeDonnees = "") Then
                                 Continue For
                             Else
-                                uneClasse &= getNumberTab(3) & "uneTable." & col.VarDePropriete & " = " & ' aDtr.Item(""" & col.NomColonneOriginal & """)" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "result." & col.VarDePropriete & " = " & ' aDtr.Item(""" & col.NomColonneOriginal & """)" & vbCrLf
                                                                "If(IsDBNull(aDtr.Item(""" & col.NomColonneOriginal & """)), Nothing, CType(aDtr.Item(""" & col.NomColonneOriginal & """), " & col.TypeDeDonnees & "))" & vbCrLf
                             End If
 
                         Next
 
                         uneClasse &= getNumberTab(3) & "" & vbCrLf
-                        uneClasse &= getNumberTab(3) & "lst.Add(uneTable)" & vbCrLf
                         uneClasse &= getNumberTab(2) & "" & vbCrLf
                         uneClasse &= getNumberTab(2) & "End While" & vbCrLf
                         uneClasse &= getNumberTab(2) & "" & vbCrLf
@@ -2165,7 +2187,7 @@ Public Class ViewModelMainWindow
 
 
                         uneClasse &= getNumberTab(2) & "" & vbCrLf
-                        uneClasse &= getNumberTab(2) & "Return lst" & vbCrLf
+                        uneClasse &= getNumberTab(2) & "Return result" & vbCrLf
                         uneClasse &= getNumberTab(2) & "" & vbCrLf
                         uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
                         uneClasse &= "" & vbCrLf

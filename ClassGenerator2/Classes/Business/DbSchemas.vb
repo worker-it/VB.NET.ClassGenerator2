@@ -14,13 +14,14 @@
 '************************************************************************************
 #Region "Library Imports"
 
-
+Imports System.Collections.ObjectModel
+Imports System.Data
+Imports ModifiedControls.TreeView
 
 #End Region
 
-Imports System.Globalization
-
-Public Class DatabaseColumn
+Public Class DbSchemas
+    Inherits TreeView.Noeud
     Implements IDisposable
 
     '************************************************************************************
@@ -58,21 +59,65 @@ Public Class DatabaseColumn
     '************************************************************************************
 #Region "Constructors"
 
-    Public Sub New(ByVal variableColOriginal As String,
-                   ByVal variableDeClasse As String,
-                   ByVal variableDePropriete As String,
-                   ByVal variableTypeDonnees As String,
-                   ByVal _isPrimaryKey As Boolean)
+    Public Sub New(ByVal UnSchema As String, ByVal tables As List(Of String))
 
-        NomColonneOriginal = variableColOriginal
-        VarDeClasse = variableDeClasse
-        VarDePropriete = variableDePropriete
-        VarDeConstructeur = "_" & variableDePropriete
-        TypeDeDonnees = variableTypeDonnees
-        IsPrimaryKey = _isPrimaryKey
+        ' This call is required by the designer.
+        'InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+
+        Me.New(UnSchema, tables, False)
 
     End Sub
 
+    Public Sub New(ByVal UnSchema As String, ByVal tables As ObservableCollection(Of TreeView.Noeud))
+
+        ' This call is required by the designer.
+        'InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+
+        Me.New(UnSchema, tables, False)
+
+    End Sub
+
+    Public Sub New(ByVal UnSchema As String, ByVal tables As List(Of String), ByVal _isSelected As Boolean)
+
+        ' This call is required by the designer.
+        'InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+
+        Childrens = New ObservableCollection(Of TreeView.Noeud)
+        parent = Nothing
+        Name = UnSchema
+        IsChecked = False
+        IsSelected = _isSelected
+
+        For Each tbl As String In tables
+            Childrens.Add(New DbTable(tbl))
+        Next
+
+        setParentsToChilds()
+
+    End Sub
+
+    Public Sub New(ByVal UnSchema As String, ByVal tables As ObservableCollection(Of TreeView.Noeud), ByVal _isSelected As Boolean)
+
+        ' This call is required by the designer.
+        'InitializeComponent()
+
+        ' Add any initialization after the InitializeComponent() call.
+
+        Childrens = tables
+        parent = Nothing
+        Name = UnSchema
+        IsChecked = False
+        IsSelected = _isSelected
+
+        setParentsToChilds()
+
+    End Sub
 
 #End Region
 
@@ -121,12 +166,23 @@ Public Class DatabaseColumn
     '------- --------
     '------- --------
 
-    Public Property NomColonneOriginal As String = ""
-    Public Property VarDeClasse As String = ""
-    Public Property VarDePropriete As String = ""
-    Public Property VarDeConstructeur As String = ""
-    Public Property TypeDeDonnees As String = ""
-    Public Property IsPrimaryKey As Boolean = False
+    Public Overloads Property Name As String
+        Get
+            Return TreeViewItemBaseText
+        End Get
+        Set(value As String)
+            TreeViewItemBaseText = value
+        End Set
+    End Property
+
+    Public Overloads Property Childrens As ObservableCollection(Of TreeView.Noeud)
+        Get
+            Return MyBase.Childrens
+        End Get
+        Set(value As ObservableCollection(Of TreeView.Noeud))
+            MyBase.Childrens = value
+        End Set
+    End Property
 
 #End Region
 
@@ -141,11 +197,25 @@ Public Class DatabaseColumn
     '------- ------
     '------- ------
 
-    '------- --------
-    '------- --------
-    'Section publique
-    '------- --------
-    '------- --------
+    Public Sub addTable(ByVal UnSchema As DbTable)
+        Childrens.Add(UnSchema)
+    End Sub
+
+    Public Sub clear()
+        Childrens.Clear()
+    End Sub
+
+    Public Sub insert(ByVal index As Int32, ByVal UnSchema As DbTable)
+        Childrens.Insert(index, UnSchema)
+    End Sub
+
+    Public Sub SetItem(ByVal index As Int32, ByVal item As DbTable)
+        Childrens.Item(index) = item
+    End Sub
+
+    Public Sub RemoveAt(index As Integer)
+        Childrens.RemoveAt(index)
+    End Sub
 
 #End Region
 
@@ -166,6 +236,17 @@ Public Class DatabaseColumn
     '------- --------
     '------- --------
 
+    Public Function Contains(item As DbTable) As Boolean
+        Return Childrens.Contains(item)
+    End Function
+
+    Public Function IndexOf(item As DbTable) As Integer
+        Return Childrens.IndexOf(item)
+    End Function
+
+    Public Function Remove(item As DbTable) As Boolean
+        Return Childrens.Remove(item)
+    End Function
 #End Region
 
     '************************************************************************************

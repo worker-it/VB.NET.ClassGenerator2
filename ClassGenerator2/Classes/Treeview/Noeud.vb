@@ -119,7 +119,7 @@ Namespace TreeView
         '------- --------
         '------- --------
 
-        Protected Property Childrens As ObservableCollection(Of Noeud)
+        Public Overridable Property Childrens As ObservableCollection(Of Noeud)
             Get
                 If (_childrens Is Nothing) Then
                     Return Nothing
@@ -221,7 +221,7 @@ Namespace TreeView
             End Get
         End Property
 
-        Public Property Name As String
+        Public Overridable Property Name As String
             Get
                 Return Me.TreeViewItemBaseText
             End Get

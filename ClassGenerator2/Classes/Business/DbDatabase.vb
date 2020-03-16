@@ -64,12 +64,17 @@ Public Class DbDatabase
         Dim lst As New ObservableCollection(Of TreeView.Noeud)
 
         For i As Integer = 1 To 5
-            Dim cols As New List(Of String)
-            For j As Integer = 1 To 12
-                cols.Add("Colonne_" & j)
+            Dim tbls As New list(Of TreeView.Noeud)
+            For j As Integer = 1 To 5
+                Dim cols As New List(Of String)
+                For k As Integer = 1 To 12
+                    cols.Add("Colonne_" & k)
+                Next
+                tbls.Add(New DbTable("Table_" & j, cols, False))
             Next
-            lst.Add(New DbTable("Table_" & i, cols, False))
+            lst.add(New DBschemas( ))
         Next
+
 
         Dim lstdb As New ObservableCollection(Of TreeView.Noeud)
         lstdb.Add(New DbDatabase("Test DB", lst, False))
@@ -161,7 +166,7 @@ Public Class DbDatabase
     '------- --------
     '------- --------
 
-    Public Overloads Property Name As String
+    Public Overrides Property Name As String
         Get
             Return TreeViewItemBaseText
         End Get
@@ -170,7 +175,7 @@ Public Class DbDatabase
         End Set
     End Property
 
-    Public Overloads Property Childrens As ObservableCollection(Of TreeView.Noeud)
+    Public Overrides Property Childrens As ObservableCollection(Of TreeView.Noeud)
         Get
             Return MyBase.Childrens
         End Get
