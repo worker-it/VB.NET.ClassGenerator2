@@ -16,7 +16,7 @@
 
 Imports System.Collections.ObjectModel
 Imports System.Data
-Imports ModifiedControls.TreeView
+
 
 #End Region
 
@@ -72,7 +72,7 @@ Public Class DbDatabase
                 Next
                 tbls.Add(New DbTable("Table_" & j, cols, False))
             Next
-            lst.add(New DbS)
+            lst.Add(New DbSchemas("Schema_" & i, tbls, False))
         Next
 
 
@@ -203,20 +203,20 @@ Public Class DbDatabase
     '------- --------
     '------- --------
 
-    Public Sub addTable(ByVal uneTable As DbTable)
-        Childrens.Add(uneTable)
+    Public Sub addSchema(ByVal UnSchema As DbSchemas)
+        Childrens.Add(UnSchema)
     End Sub
 
     Public Sub clear()
         Childrens.Clear()
     End Sub
 
-    Public Sub insert(ByVal index As Int32, ByVal uneTable As DbTable)
-        Childrens.Insert(index, uneTable)
+    Public Sub insert(ByVal index As Int32, ByVal UnSchema As DbSchemas)
+        Childrens.Insert(index, UnSchema)
     End Sub
 
-    Public Sub SetItem(ByVal index As Int32, ByVal item As DbTable)
-        Childrens.Item(index) = item
+    Public Sub SetItem(ByVal index As Int32, ByVal UnSchema As DbSchemas)
+        Childrens.Item(index) = UnSchema
     End Sub
 
     Public Sub RemoveAt(index As Integer)
@@ -242,15 +242,15 @@ Public Class DbDatabase
     '------- --------
     '------- --------
 
-    Public Function Contains(item As DbTable) As Boolean
+    Public Function Contains(item As DbSchemas) As Boolean
         Return Childrens.Contains(item)
     End Function
 
-    Public Function IndexOf(item As DbTable) As Integer
+    Public Function IndexOf(item As DbSchemas) As Integer
         Return Childrens.IndexOf(item)
     End Function
 
-    Public Function Remove(item As DbTable) As Boolean
+    Public Function Remove(item As DbSchemas) As Boolean
         Return Childrens.Remove(item)
     End Function
 

@@ -16,7 +16,7 @@
 
 Imports System.Collections.ObjectModel
 Imports System.Data
-Imports ModifiedControls.TreeView
+
 
 #End Region
 
@@ -59,7 +59,7 @@ Public Class DbSchemas
     '************************************************************************************
 #Region "Constructors"
 
-    Public Sub New(ByVal UnSchema As String, ByVal tables As List(Of String))
+    Public Sub New(ByVal UnSchema As String, ByVal tables As List(Of TreeView.Noeud))
 
         ' This call is required by the designer.
         'InitializeComponent()
@@ -81,7 +81,7 @@ Public Class DbSchemas
 
     End Sub
 
-    Public Sub New(ByVal UnSchema As String, ByVal tables As List(Of String), ByVal _isSelected As Boolean)
+    Public Sub New(ByVal UnSchema As String, ByVal tables As List(Of TreeView.Noeud), ByVal _isSelected As Boolean)
 
         ' This call is required by the designer.
         'InitializeComponent()
@@ -94,8 +94,8 @@ Public Class DbSchemas
         IsChecked = False
         IsSelected = _isSelected
 
-        For Each tbl As String In tables
-            Childrens.Add(New DbTable(tbl))
+        For Each tbl As TreeView.Noeud In tables
+            Childrens.Add(tbl)
         Next
 
         setParentsToChilds()
@@ -166,7 +166,7 @@ Public Class DbSchemas
     '------- --------
     '------- --------
 
-    Public Overloads Property Name As String
+    Public Overrides Property Name As String
         Get
             Return TreeViewItemBaseText
         End Get
@@ -175,7 +175,7 @@ Public Class DbSchemas
         End Set
     End Property
 
-    Public Overloads Property Childrens As ObservableCollection(Of TreeView.Noeud)
+    Public Overrides Property Childrens As ObservableCollection(Of TreeView.Noeud)
         Get
             Return MyBase.Childrens
         End Get
@@ -197,20 +197,20 @@ Public Class DbSchemas
     '------- ------
     '------- ------
 
-    Public Sub addTable(ByVal UnSchema As DbTable)
-        Childrens.Add(UnSchema)
+    Public Sub addTable(ByVal UneTable As DbTable)
+        Childrens.Add(UneTable)
     End Sub
 
     Public Sub clear()
         Childrens.Clear()
     End Sub
 
-    Public Sub insert(ByVal index As Int32, ByVal UnSchema As DbTable)
-        Childrens.Insert(index, UnSchema)
+    Public Sub insert(ByVal index As Int32, ByVal UneTable As DbTable)
+        Childrens.Insert(index, UneTable)
     End Sub
 
-    Public Sub SetItem(ByVal index As Int32, ByVal item As DbTable)
-        Childrens.Item(index) = item
+    Public Sub SetItem(ByVal index As Int32, ByVal UneTable As DbTable)
+        Childrens.Item(index) = UneTable
     End Sub
 
     Public Sub RemoveAt(index As Integer)

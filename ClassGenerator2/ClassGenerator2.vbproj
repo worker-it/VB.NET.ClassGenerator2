@@ -208,6 +208,7 @@
     <Compile Include="Classes\Business\DatabaseColumn.vb" />
     <Compile Include="Classes\Business\DbChampTable.vb" />
     <Compile Include="Classes\Business\DbDatabase.vb" />
+    <Compile Include="Classes\Business\DbSchemas.vb" />
     <Compile Include="Classes\Business\DbTable.vb" />
     <Compile Include="Classes\Converters\BooleanFromEmptyList.vb" />
     <Compile Include="Classes\Converters\BooleanFromInteger.vb" />
