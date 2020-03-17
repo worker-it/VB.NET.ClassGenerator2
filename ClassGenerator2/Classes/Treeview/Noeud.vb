@@ -349,6 +349,10 @@ Namespace TreeView
             Next
         End Sub
 
+        Public Overrides Function ToString() As String
+            Return _TreeViewItemBaseText
+        End Function
+
 #End Region
 
         '************************************************************************************

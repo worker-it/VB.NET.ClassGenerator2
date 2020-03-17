@@ -168,7 +168,7 @@ Public Class DbTable
 
     Public Overloads Property Name As String
         Get
-            Return If(tableSchema = "", "", tableSchema & ".") & TreeViewItemBaseText
+            Return TreeViewItemBaseText
         End Get
         Set(value As String)
             TreeViewItemBaseText = value
@@ -184,7 +184,6 @@ Public Class DbTable
         End Set
     End Property
 
-    Public Property tableSchema As String
 
 
 #End Region
