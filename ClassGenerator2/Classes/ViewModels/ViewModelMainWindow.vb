@@ -1473,20 +1473,20 @@ Public Class ViewModelMainWindow
                             ' À faire
                             '************************************************************************************
 
-                            uneClasse &= getNumberTab(1) & "''' <summary>" & vbCrLf
-                            uneClasse &= getNumberTab(1) & " ''' Constructeur de base sans paramètre" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "''' </summary>" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "Public Sub New(" & getPKSignature(listeDesColonnes, True) & ")" & vbCrLf
-                            uneClasse &= "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & " ' This call is required by the designer." & vbCrLf
-                            uneClasse &= getNumberTab(2) & "'InitializeComponent()" & vbCrLf
-                            uneClasse &= "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "' Add any initialization after the InitializeComponent() call." & vbCrLf
-                            uneClasse &= "" & vbCrLf
-                            'uneClasse &= constructeurContenu2
-                            uneClasse &= "" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "End Sub" & vbCrLf
-                            uneClasse &= "" & vbCrLf
+                            'uneClasse &= getNumberTab(1) & "''' <summary>" & vbCrLf
+                            'uneClasse &= getNumberTab(1) & " ''' Constructeur de base sans paramètre" & vbCrLf
+                            'uneClasse &= getNumberTab(1) & "''' </summary>" & vbCrLf
+                            'uneClasse &= getNumberTab(1) & "Public Sub New(" & getPKSignature(listeDesColonnes, True) & ")" & vbCrLf
+                            'uneClasse &= "" & vbCrLf
+                            'uneClasse &= getNumberTab(2) & " ' This call is required by the designer." & vbCrLf
+                            'uneClasse &= getNumberTab(2) & "'InitializeComponent()" & vbCrLf
+                            'uneClasse &= "" & vbCrLf
+                            'uneClasse &= getNumberTab(2) & "' Add any initialization after the InitializeComponent() call." & vbCrLf
+                            'uneClasse &= "" & vbCrLf
+                            ''uneClasse &= constructeurContenu2
+                            'uneClasse &= "" & vbCrLf
+                            'uneClasse &= getNumberTab(1) & "End Sub" & vbCrLf
+                            'uneClasse &= "" & vbCrLf
 
                             '************************************************************************************
                             'Constructeur avec paramètres
