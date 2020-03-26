@@ -43,7 +43,7 @@ Public Class DbTable
 
     'Classe Variables
 
-
+    Private BooIsTable As Boolean = True
 
     '------- --------
     '------- --------
@@ -59,29 +59,29 @@ Public Class DbTable
     '************************************************************************************
 #Region "Constructors"
 
-    Public Sub New(ByVal uneTable As String, ByVal colonnes As List(Of String))
+    Public Sub New(ByVal uneTable As String, ByVal colonnes As List(Of String), Optional ByVal _IsTable As Boolean = True)
 
         ' This call is required by the designer.
         'InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
 
-        Me.New(uneTable, colonnes, False)
+        Me.New(uneTable, colonnes, False, _IsTable)
 
     End Sub
 
-    Public Sub New(ByVal uneTable As String, ByVal colonnes As ObservableCollection(Of TreeView.Noeud))
+    Public Sub New(ByVal uneTable As String, ByVal colonnes As ObservableCollection(Of TreeView.Noeud), Optional ByVal _IsTable As Boolean = True)
 
         ' This call is required by the designer.
         'InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
 
-        Me.New(uneTable, colonnes, False)
+        Me.New(uneTable, colonnes, False, _IsTable)
 
     End Sub
 
-    Public Sub New(ByVal uneTable As String, ByVal colonnes As List(Of String), ByVal _isSelected As Boolean)
+    Public Sub New(ByVal uneTable As String, ByVal colonnes As List(Of String), ByVal _isSelected As Boolean, Optional ByVal _IsTable As Boolean = True)
 
         ' This call is required by the designer.
         'InitializeComponent()
@@ -93,6 +93,7 @@ Public Class DbTable
         Name = uneTable
         IsChecked = False
         IsSelected = _isSelected
+        IsTable = _IsTable
 
         For Each col As String In colonnes
             Childrens.Add(New DbChampTable(col))
@@ -102,7 +103,7 @@ Public Class DbTable
 
     End Sub
 
-    Public Sub New(ByVal uneTable As String, ByVal colonnes As ObservableCollection(Of TreeView.Noeud), ByVal _isSelected As Boolean)
+    Public Sub New(ByVal uneTable As String, ByVal colonnes As ObservableCollection(Of TreeView.Noeud), ByVal _isSelected As Boolean, Optional ByVal _IsTable As Boolean = True)
 
         ' This call is required by the designer.
         'InitializeComponent()
@@ -114,6 +115,7 @@ Public Class DbTable
         Name = uneTable
         IsChecked = False
         IsSelected = _isSelected
+        IsTable = _IsTable
 
         setParentsToChilds()
 
@@ -184,7 +186,14 @@ Public Class DbTable
         End Set
     End Property
 
-
+    Public Property IsTable As Boolean
+        Get
+            Return BooIsTable
+        End Get
+        Set(value As Boolean)
+            BooIsTable = value
+        End Set
+    End Property
 
 #End Region
 

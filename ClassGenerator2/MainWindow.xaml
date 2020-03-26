@@ -310,13 +310,21 @@
                   VerticalAlignment="Stretch" VerticalContentAlignment="Center"
                   Visibility="{Binding ElementName=cbxDatabaseType, Path=SelectedIndex, Converter={StaticResource Equals1}}" />
 
+        <Button x:Name="btnRetrieveDbs" Content="Load databases"
+                Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,2,5,2"
+                FontFamily="Arial Black" FontSize="12"
+                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                Command="{Binding RetrieveDBs}"
+                CommandParameter="{Binding ElementName=tbxPassword}"/>
+
         <Label x:Name="lblDatabase" Content="Base de données / Catalogue :"
-                   Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                   Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
                    FontFamily="Arial Black" FontSize="16"
                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                    VerticalAlignment="Stretch" VerticalContentAlignment="Center" />
         <ComboBox x:Name="cbxDatabase" Margin="2" 
-                  Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2"
+                  Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="2"
                   FontFamily="Arial Black" FontSize="16"
                   HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                   VerticalAlignment="Stretch" VerticalContentAlignment="Center" 
@@ -325,14 +333,6 @@
                   ItemsSource="{Binding ListeDesBaseDeDonnees, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                   SelectedIndex="{Binding DatabaseCatalog, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" 
                   SelectedValue="{Binding SelectedDB, Mode=OneWayToSource}"/>
-
-        <Button x:Name="btnRetrieveDbs" Content="Load databases"
-                Grid.Row="5" Grid.Column="5" Grid.ColumnSpan="2" Margin="5,2,5,2"
-                FontFamily="Arial Black" FontSize="12"
-                HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                Command="{Binding RetrieveDBs}"
-                CommandParameter="{Binding ElementName=tbxPassword}"/>
 
         <Button x:Name="btnRetrieveDbInfos" Content="Retrieve Db Infos"
                 Grid.Row="6" Grid.Column="5" Grid.ColumnSpan="2" Margin="5,2,5,2"

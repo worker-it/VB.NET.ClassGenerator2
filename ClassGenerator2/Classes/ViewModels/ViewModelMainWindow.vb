@@ -824,13 +824,17 @@ Public Class ViewModelMainWindow
                     cnxTables.Open()
 
                     'Création de la requête sql      
-                    sqlTables = "SELECT schemaname, tablename as object_name " &
+                    sqlTables = "SELECT schemaname, tablename as object_name, table_type " &
                                 "FROM """ & Me.SelectedDB & """.""pg_catalog"".""pg_tables"" " &
                                 "WHERE schemaname='" & dtrSchemas.Item("schema_name").ToString() & "' " &
                                 "UNION ALL " &
-                                "SELECT schemaname, viewname as object_name " &
+                                "SELECT schemaname, viewname as object_name, table_type " &
                                 "FROM """ & Me.SelectedDB & """.""pg_catalog"".""pg_views"" " &
                                 "WHERE schemaname='" & dtrSchemas.Item("schema_name").ToString() & "';"
+
+                    sqlTables = "SELECT table_schema AS schemaname, table_name AS object_name, table_type " &
+                                "FROM """ & Me.SelectedDB & """.""information_schema"".""tables"" " &
+                                "WHERE table_schema='" & dtrSchemas.Item("schema_name").ToString() & "';"
 
                     'Création de la commande et on l'instancie (sql)       
                     cmdTables = New NpgsqlCommand(sqlTables, CType(cnxTables, NpgsqlConnection))
@@ -884,7 +888,7 @@ Public Class ViewModelMainWindow
                             colonnes.Add(uneColonne)
                         End While
 
-                        lst.Add(New DbTable(dtrTables.Item("object_name").ToString(), colonnes))
+                        lst.Add(New DbTable(dtrTables.Item("object_name").ToString(), colonnes, dtrTables.Item("table_type").ToString().ToUpper() <> "VIEW"))
 
                         dtrColonnes.Close()
                         dtrColonnes = Nothing
@@ -1609,145 +1613,41 @@ Public Class ViewModelMainWindow
                             'Création de la fonction insert de la classe
                             '************************************************************************************
 
-                            uneClasse &= getNumberTab(2) & "''' <summary>" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' Fonction permettant d'insérer dans la table de la classe l'objet passé en paramètre." & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "Private Shared Function Insert" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Integer" & vbCrLf
-                            uneClasse &= "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim resultat As Integer = 0" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim sqlTables As String" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim aConn As DbConnection" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim aCommand As DbCommand" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
+                            If (tbl.IsTable) Then
 
-                            Select Case Me.TypeBaseDonnees
-                                Case databaseType.SQL_SERVER, databaseType.MYSQL, databaseType.ORACLE, databaseType.MS_ACCESS_2007_2019, databaseType.MS_ACCESS_97_2003, databaseType.MS_EXCEL, databaseType.FLAT_FILE
-                                    qryDbName = db.Name
-                                    qryTblName = tbl.Name
-                                Case databaseType.POSTGRE_SQL
-                                    qryDbName = """""" & db.Name & """"""
-                                    qryTblName = ("""""" & tbl.Name & """""").Replace(".", """"".""""")
-                                Case Else
+                                uneClasse &= getNumberTab(2) & "''' <summary>" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "''' Fonction permettant d'insérer dans la table de la classe l'objet passé en paramètre." & vbCrLf
+                                uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "Private Shared Function Insert" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Integer" & vbCrLf
+                                uneClasse &= "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim resultat As Integer = 0" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim sqlTables As String" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim aConn As DbConnection" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim aCommand As DbCommand" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
 
-                            End Select                    'Création de la requête sql      
-                            sqlTables = "INSERT INTO " & qryDbName & "." & qryTblName & " ("
-                            For Each col As UneColonne In listeDesColonnes
-                                sqlTables &= col.NomColonneOriginal & ", "
-                            Next
+                                Select Case Me.TypeBaseDonnees
+                                    Case databaseType.SQL_SERVER, databaseType.MYSQL, databaseType.ORACLE, databaseType.MS_ACCESS_2007_2019, databaseType.MS_ACCESS_97_2003, databaseType.MS_EXCEL, databaseType.FLAT_FILE
+                                        qryDbName = db.Name
+                                        qryTblName = tbl.Name
+                                    Case databaseType.POSTGRE_SQL
+                                        qryDbName = """""" & db.Name & """"""
+                                        qryTblName = ("""""" & tbl.Name & """""").Replace(".", """"".""""")
+                                    Case Else
 
-                            sqlTables = Strings.Left(sqlTables, sqlTables.Length - 2) & ") VALUES ("
+                                End Select                    'Création de la requête sql      
+                                sqlTables = "INSERT INTO " & qryDbName & "." & qryTblName & " ("
+                                For Each col As UneColonne In listeDesColonnes
+                                    sqlTables &= col.NomColonneOriginal & ", "
+                                Next
 
-                            For Each col As UneColonne In listeDesColonnes
+                                sqlTables = Strings.Left(sqlTables, sqlTables.Length - 2) & ") VALUES ("
 
-                                If (col Is Nothing) OrElse (col.TypeDeDonnees Is Nothing) OrElse (col.TypeDeDonnees = "") Then
-                                    Continue For
-                                Else
-                                    Select Case col.TypeDeDonnees
-                                        Case "Long", "Integer", "Byte", "Double", "Decimal"
-                                            sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
-                                        Case "Char", "DateDate", "String"
-                                            sqlTables &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""', "
-                                        Case Else
-                                            sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
-                                    End Select
-                                End If
+                                For Each col As UneColonne In listeDesColonnes
 
-                            Next
-
-                            sqlTables = Strings.Left(sqlTables, sqlTables.Length - 2) & ");"
-
-                            Select Case CType(Me.lngTypeBaseDonnees, databaseType)
-                                Case databaseType.SQL_SERVER
-
-                                    NewConnections = "New OleDbConnection()"
-                                    CommandeSQL = "New OleDbCommand(sqlTables, CType(aConn, OleDbConnection))"
-
-                                Case databaseType.ORACLE
-                                Case databaseType.MYSQL
-
-                                    NewConnections = "New MySqlConnection()"
-                                    CommandeSQL = "New MySqlCommand(sqlTables, CType(aConn, MySqlConnection))"
-
-                                Case databaseType.POSTGRE_SQL
-
-                                    NewConnections = "New NpgSqlConnection()"
-                                    CommandeSQL = "New NpgSqlCommand(sqlTables, CType(aConn, NpgSqlConnection))"
-
-                                Case databaseType.MS_ACCESS_97_2003
-                                Case databaseType.MS_ACCESS_2007_2019
-                                Case databaseType.MS_EXCEL
-                                Case databaseType.FLAT_FILE
-                            End Select
-
-                            uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Else" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "End If" & vbCrLf
-
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "'Création de la requête sql" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "sqlTables = """ & sqlTables & """" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "'Création de la commande et on l'exécute" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "aCommand = " & CommandeSQL & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "resultat = aCommand.ExecuteNonQuery()" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "aCommand = Nothing" & vbCrLf
-
-                            uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.Close()" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn = Nothing" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "End If" & vbCrLf
-
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Return resultat" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "" & vbCrLf
-
-                            '************************************************************************************
-                            'Création de la fonction update de la classe
-                            '************************************************************************************
-
-                            uneClasse &= getNumberTab(2) & "''' <summary>" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' Fonction permettant de mettre à jour l'objet passé en paramètre dans la table de la classe s'il existe." & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "Private Shared Function Update" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Integer" & vbCrLf
-                            uneClasse &= "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim resultat As Integer = 0" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim sqlTables As String" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim aConn As DbConnection" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim aCommand As DbCommand" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-
-                            'Création de la requête sql      
-                            sqlTables = "UPDATE " & qryDbName & "." & qryTblName & " SET "
-                            sqlConditions = "WHERE "
-                            For Each col As UneColonne In listeDesColonnes
-
-                                If (col.IsPrimaryKey) Then
-                                    sqlConditions &= col.NomColonneOriginal & " = "
-                                    Select Case col.TypeDeDonnees
-                                        Case "Long", "Integer", "Byte", "Double", "Decimal"
-                                            sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
-                                        Case "Char", "DateDate", "String"
-                                            sqlConditions &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""', "
-                                        Case Else
-                                            sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
-                                    End Select
-                                Else
-
-                                    sqlTables &= col.NomColonneOriginal & " = "
                                     If (col Is Nothing) OrElse (col.TypeDeDonnees Is Nothing) OrElse (col.TypeDeDonnees = "") Then
                                         Continue For
                                     Else
@@ -1761,65 +1661,178 @@ Public Class ViewModelMainWindow
                                         End Select
                                     End If
 
-                                End If
+                                Next
 
-                            Next
+                                sqlTables = Strings.Left(sqlTables, sqlTables.Length - 2) & ");"
 
-                            sqlTables = Strings.Left(sqlTables, sqlTables.Length - 2) & " " & Strings.Left(sqlConditions, sqlConditions.Length - 2) & ";"
+                                Select Case CType(Me.lngTypeBaseDonnees, databaseType)
+                                    Case databaseType.SQL_SERVER
 
-                            Select Case CType(Me.lngTypeBaseDonnees, databaseType)
-                                Case databaseType.SQL_SERVER
+                                        NewConnections = "New OleDbConnection()"
+                                        CommandeSQL = "New OleDbCommand(sqlTables, CType(aConn, OleDbConnection))"
 
-                                    NewConnections = "New OleDbConnection()"
-                                    CommandeSQL = "New OleDbCommand(sqlTables, CType(aConn, OleDbConnection))"
+                                    Case databaseType.ORACLE
+                                    Case databaseType.MYSQL
 
-                                Case databaseType.ORACLE
-                                Case databaseType.MYSQL
+                                        NewConnections = "New MySqlConnection()"
+                                        CommandeSQL = "New MySqlCommand(sqlTables, CType(aConn, MySqlConnection))"
 
-                                    NewConnections = "New MySqlConnection()"
-                                    CommandeSQL = "New MySqlCommand(sqlTables, CType(aConn, MySqlConnection))"
+                                    Case databaseType.POSTGRE_SQL
 
-                                Case databaseType.POSTGRE_SQL
+                                        NewConnections = "New NpgSqlConnection()"
+                                        CommandeSQL = "New NpgSqlCommand(sqlTables, CType(aConn, NpgSqlConnection))"
 
-                                    NewConnections = "New NpgSqlConnection()"
-                                    CommandeSQL = "New NpgSqlCommand(sqlTables, CType(aConn, NpgSqlConnection))"
+                                    Case databaseType.MS_ACCESS_97_2003
+                                    Case databaseType.MS_ACCESS_2007_2019
+                                    Case databaseType.MS_EXCEL
+                                    Case databaseType.FLAT_FILE
+                                End Select
 
-                                Case databaseType.MS_ACCESS_97_2003
-                                Case databaseType.MS_ACCESS_2007_2019
-                                Case databaseType.MS_EXCEL
-                                Case databaseType.FLAT_FILE
-                            End Select
+                                uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Else" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End If" & vbCrLf
 
-                            uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Else" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "End If" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "'Création de la requête sql" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "sqlTables = """ & sqlTables & """" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "'Création de la commande et on l'exécute" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "aCommand = " & CommandeSQL & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "resultat = aCommand.ExecuteNonQuery()" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "aCommand = Nothing" & vbCrLf
 
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "'Création de la requête sql" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "sqlTables = """ & sqlTables & """" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "'Création de la commande et on l'exécute" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "aCommand = " & CommandeSQL & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "resultat = aCommand.ExecuteNonQuery()" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "aCommand = Nothing" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.Close()" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn = Nothing" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End If" & vbCrLf
 
-                            uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.Close()" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn = Nothing" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "End If" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Return resultat" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "" & vbCrLf
 
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Return resultat" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
+                            End If
 
-                            uneClasse &= getNumberTab(1) & "" & vbCrLf
+
+                            '************************************************************************************
+                            'Création de la fonction update de la classe
+                            '************************************************************************************
+
+                            If (tbl.IsTable) Then
+
+                                uneClasse &= getNumberTab(2) & "''' <summary>" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "''' Fonction permettant de mettre à jour l'objet passé en paramètre dans la table de la classe s'il existe." & vbCrLf
+                                uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "Private Shared Function Update" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Integer" & vbCrLf
+                                uneClasse &= "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim resultat As Integer = 0" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim sqlTables As String" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim aConn As DbConnection" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim aCommand As DbCommand" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+
+                                'Création de la requête sql      
+                                sqlTables = "UPDATE " & qryDbName & "." & qryTblName & " SET "
+                                sqlConditions = "WHERE "
+                                For Each col As UneColonne In listeDesColonnes
+
+                                    If (col.IsPrimaryKey) Then
+                                        sqlConditions &= col.NomColonneOriginal & " = "
+                                        Select Case col.TypeDeDonnees
+                                            Case "Long", "Integer", "Byte", "Double", "Decimal"
+                                                sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
+                                            Case "Char", "DateDate", "String"
+                                                sqlConditions &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""', "
+                                            Case Else
+                                                sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
+                                        End Select
+                                    Else
+
+                                        sqlTables &= col.NomColonneOriginal & " = "
+                                        If (col Is Nothing) OrElse (col.TypeDeDonnees Is Nothing) OrElse (col.TypeDeDonnees = "") Then
+                                            Continue For
+                                        Else
+                                            Select Case col.TypeDeDonnees
+                                                Case "Long", "Integer", "Byte", "Double", "Decimal"
+                                                    sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
+                                                Case "Char", "DateDate", "String"
+                                                    sqlTables &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""', "
+                                                Case Else
+                                                    sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
+                                            End Select
+                                        End If
+
+                                    End If
+
+                                Next
+
+                                sqlTables = Strings.Left(sqlTables, sqlTables.Length - 2) & " " & Strings.Left(sqlConditions, sqlConditions.Length - 2) & ";"
+
+                                Select Case CType(Me.lngTypeBaseDonnees, databaseType)
+                                    Case databaseType.SQL_SERVER
+
+                                        NewConnections = "New OleDbConnection()"
+                                        CommandeSQL = "New OleDbCommand(sqlTables, CType(aConn, OleDbConnection))"
+
+                                    Case databaseType.ORACLE
+                                    Case databaseType.MYSQL
+
+                                        NewConnections = "New MySqlConnection()"
+                                        CommandeSQL = "New MySqlCommand(sqlTables, CType(aConn, MySqlConnection))"
+
+                                    Case databaseType.POSTGRE_SQL
+
+                                        NewConnections = "New NpgSqlConnection()"
+                                        CommandeSQL = "New NpgSqlCommand(sqlTables, CType(aConn, NpgSqlConnection))"
+
+                                    Case databaseType.MS_ACCESS_97_2003
+                                    Case databaseType.MS_ACCESS_2007_2019
+                                    Case databaseType.MS_EXCEL
+                                    Case databaseType.FLAT_FILE
+                                End Select
+
+                                uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Else" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End If" & vbCrLf
+
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "'Création de la requête sql" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "sqlTables = """ & sqlTables & """" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "'Création de la commande et on l'exécute" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "aCommand = " & CommandeSQL & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "resultat = aCommand.ExecuteNonQuery()" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "aCommand = Nothing" & vbCrLf
+
+                                uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.Close()" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn = Nothing" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End If" & vbCrLf
+
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Return resultat" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
+
+                                uneClasse &= getNumberTab(1) & "" & vbCrLf
+
+                            End If
 
                             '************************************************************************************
                             'Création de la fonction objet existe de la classe
@@ -1920,113 +1933,117 @@ Public Class ViewModelMainWindow
                             'Création de la fonction delete objet de la classe
                             '************************************************************************************
 
-                            uneClasse &= getNumberTab(1) & "''' <summary>" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "''' Fonction permettant de supprimer l'objet passé en paramètre de la base de données." & vbCrLf
-                            uneClasse &= getNumberTab(1) & "''' </summary>" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "Private Shared Function Delete" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Integer" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim resultat As Integer = 0" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "Dim sqlTables As String" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim aConn As DbConnection" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim aCommand As DbCommand" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "If (" & leNomDeLaTable.NomSingulier & "Exists(_" & leNomDeLaTable.NomSingulier & ")) Then" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "" & vbCrLf
+                            If (tbl.IsTable) Then
 
-                            'Création de la requête sql      
-                            sqlTables = "DELETE FROM " & qryDbName & "." & qryTblName & " "
-                            sqlConditions = "WHERE "
-                            For Each col As UneColonne In listeDesColonnes
+                                uneClasse &= getNumberTab(1) & "''' <summary>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' Fonction permettant de supprimer l'objet passé en paramètre de la base de données." & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' </summary>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "Private Shared Function Delete" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Integer" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim resultat As Integer = 0" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "Dim sqlTables As String" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim aConn As DbConnection" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim aCommand As DbCommand" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "If (" & leNomDeLaTable.NomSingulier & "Exists(_" & leNomDeLaTable.NomSingulier & ")) Then" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "" & vbCrLf
 
-                                If (col.IsPrimaryKey) Then
-                                    sqlConditions &= col.NomColonneOriginal & " = "
-                                    Select Case col.TypeDeDonnees
-                                        Case "Long", "Integer", "Byte", "Double", "Decimal"
-                                            sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "" AND "
-                                        Case "Char", "DateDate", "String"
-                                            sqlConditions &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""' AND "
-                                        Case Else
-                                            sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "" AND "
-                                    End Select
-                                End If
+                                'Création de la requête sql      
+                                sqlTables = "DELETE FROM " & qryDbName & "." & qryTblName & " "
+                                sqlConditions = "WHERE "
+                                For Each col As UneColonne In listeDesColonnes
 
-                            Next
+                                    If (col.IsPrimaryKey) Then
+                                        sqlConditions &= col.NomColonneOriginal & " = "
+                                        Select Case col.TypeDeDonnees
+                                            Case "Long", "Integer", "Byte", "Double", "Decimal"
+                                                sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "" AND "
+                                            Case "Char", "DateDate", "String"
+                                                sqlConditions &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""' AND "
+                                            Case Else
+                                                sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "" AND "
+                                        End Select
+                                    End If
 
-                            sqlTables = sqlTables & Strings.Left(sqlConditions, sqlConditions.Length - 5) & ";"
+                                Next
 
-                            Select Case CType(Me.lngTypeBaseDonnees, databaseType)
-                                Case databaseType.SQL_SERVER
+                                sqlTables = sqlTables & Strings.Left(sqlConditions, sqlConditions.Length - 5) & ";"
 
-                                    NewConnections = "New OleDbConnection()"
-                                    CommandeSQL = "New OleDbCommand(sqlTables, CType(aConn, OleDbConnection))"
+                                Select Case CType(Me.lngTypeBaseDonnees, databaseType)
+                                    Case databaseType.SQL_SERVER
+
+                                        NewConnections = "New OleDbConnection()"
+                                        CommandeSQL = "New OleDbCommand(sqlTables, CType(aConn, OleDbConnection))"
 
 
-                                Case databaseType.ORACLE
-                                Case databaseType.MYSQL
+                                    Case databaseType.ORACLE
+                                    Case databaseType.MYSQL
 
-                                    NewConnections = "New MySqlConnection()"
-                                    CommandeSQL = "New MySqlCommand(sqlTables, CType(aConn, MySqlConnection))"
+                                        NewConnections = "New MySqlConnection()"
+                                        CommandeSQL = "New MySqlCommand(sqlTables, CType(aConn, MySqlConnection))"
 
-                                Case databaseType.POSTGRE_SQL
+                                    Case databaseType.POSTGRE_SQL
 
-                                    NewConnections = "New NpgSqlConnection()"
-                                    CommandeSQL = "New NpgSqlCommand(sqlTables, CType(aConn, NpgSqlConnection))"
+                                        NewConnections = "New NpgSqlConnection()"
+                                        CommandeSQL = "New NpgSqlCommand(sqlTables, CType(aConn, NpgSqlConnection))"
 
-                                Case databaseType.MS_ACCESS_97_2003
-                                Case databaseType.MS_ACCESS_2007_2019
-                                Case databaseType.MS_EXCEL
-                                Case databaseType.FLAT_FILE
-                            End Select
+                                    Case databaseType.MS_ACCESS_97_2003
+                                    Case databaseType.MS_ACCESS_2007_2019
+                                    Case databaseType.MS_EXCEL
+                                    Case databaseType.FLAT_FILE
+                                End Select
 
-                            uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Else" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "End If" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Else" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End If" & vbCrLf
 
-                            uneClasse &= getNumberTab(3) & "" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "'Création de la requête sql" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "sqlTables = """ & sqlTables & """" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "'Création de la commande et on l'exécute" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aCommand = " & CommandeSQL & vbCrLf
-                            uneClasse &= getNumberTab(3) & "Try" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "resultat =  CType(aCommand.ExecuteScalar(), Integer)" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "Catch ex As Exception" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "resultat = -1" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "End Try" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aCommand = Nothing" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "'Création de la requête sql" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "sqlTables = """ & sqlTables & """" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "'Création de la commande et on l'exécute" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aCommand = " & CommandeSQL & vbCrLf
+                                uneClasse &= getNumberTab(3) & "Try" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "resultat =  CType(aCommand.ExecuteScalar(), Integer)" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "Catch ex As Exception" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "resultat = -1" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "End Try" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aCommand = Nothing" & vbCrLf
 
-                            uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.Close()" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn = Nothing" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "End If" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.Close()" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn = Nothing" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End If" & vbCrLf
 
-                            uneClasse &= getNumberTab(3) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Else" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "MsgBox(""L'objet """"" & leNomDeLaTable.TableName & """"" à supprimer n'existe pas."")" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "resultat = -1" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "End If" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Return resultat" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Else" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "MsgBox(""L'objet """"" & leNomDeLaTable.TableName & """"" à supprimer n'existe pas."")" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "resultat = -1" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End If" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Return resultat" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
 
-                            uneClasse &= getNumberTab(1) & "" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "'Section publique" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
-                            uneClasse &= "" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "'Section publique" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
+                                uneClasse &= "" & vbCrLf
+
+                            End If
 
                             '************************************************************************************
                             'Création de la fonction getAll objets de la classe
@@ -2048,7 +2065,7 @@ Public Class ViewModelMainWindow
 
                             'Création de la requête sql      
                             sqlTables = "SELECT * " &
-                                    "FROM " & qryDbName & "." & qryTblName & ";"
+                                "FROM " & qryDbName & "." & qryTblName & ";"
 
                             Select Case CType(Me.lngTypeBaseDonnees, databaseType)
                                 Case databaseType.SQL_SERVER
@@ -2105,7 +2122,7 @@ Public Class ViewModelMainWindow
                                     Continue For
                                 Else
                                     uneClasse &= getNumberTab(3) & "uneTable." & col.VarDePropriete & " = " & ' aDtr.Item(""" & col.NomColonneOriginal & """)" & vbCrLf
-                                                               "If(IsDBNull(aDtr.Item(""" & col.NomColonneOriginal & """)), Nothing, CType(aDtr.Item(""" & col.NomColonneOriginal & """), " & col.TypeDeDonnees & "))" & vbCrLf
+                                                           "If(IsDBNull(aDtr.Item(""" & col.NomColonneOriginal & """)), Nothing, CType(aDtr.Item(""" & col.NomColonneOriginal & """), " & col.TypeDeDonnees & "))" & vbCrLf
                                 End If
 
                             Next
@@ -2162,7 +2179,7 @@ Public Class ViewModelMainWindow
 
                             'Création de la requête sql      
                             sqlTables = "SELECT * " &
-                                    "FROM " & qryDbName & "." & qryTblName & " "
+                                "FROM " & qryDbName & "." & qryTblName & " "
                             sqlConditions = "WHERE "
                             For Each col As UneColonne In listeDesColonnes
 
@@ -2234,7 +2251,7 @@ Public Class ViewModelMainWindow
                                     Continue For
                                 Else
                                     uneClasse &= getNumberTab(3) & "result." & col.VarDePropriete & " = " & ' aDtr.Item(""" & col.NomColonneOriginal & """)" & vbCrLf
-                                                               "If(IsDBNull(aDtr.Item(""" & col.NomColonneOriginal & """)), Nothing, CType(aDtr.Item(""" & col.NomColonneOriginal & """), " & col.TypeDeDonnees & "))" & vbCrLf
+                                                           "If(IsDBNull(aDtr.Item(""" & col.NomColonneOriginal & """)), Nothing, CType(aDtr.Item(""" & col.NomColonneOriginal & """), " & col.TypeDeDonnees & "))" & vbCrLf
                                 End If
 
                             Next
@@ -2295,31 +2312,39 @@ Public Class ViewModelMainWindow
                             'Création de la fonction Save un objet de la classe
                             '************************************************************************************
 
-                            uneClasse &= getNumberTab(1) & "Public Shared Function Save" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Boolean" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Dim resultat As Boolean = False" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "If (" & leNomDeLaTable.NomSingulier & "Exists(_" & leNomDeLaTable.NomSingulier & ", AnOpenConneciton)) Then" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "resultat = (Update" & leNomDeLaTable.NomSingulier & "(_" & leNomDeLaTable.NomSingulier & ", AnOpenConneciton) > 0)" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Else" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "resultat = (Insert" & leNomDeLaTable.NomSingulier & "(_" & leNomDeLaTable.NomSingulier & ", AnOpenConneciton) > 0)" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "End If" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Return resultat" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
+                            If (tbl.IsTable) Then
+
+                                uneClasse &= getNumberTab(1) & "Public Shared Function Save" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Boolean" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Dim resultat As Boolean = False" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "If (" & leNomDeLaTable.NomSingulier & "Exists(_" & leNomDeLaTable.NomSingulier & ", AnOpenConneciton)) Then" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "resultat = (Update" & leNomDeLaTable.NomSingulier & "(_" & leNomDeLaTable.NomSingulier & ", AnOpenConneciton) > 0)" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Else" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "resultat = (Insert" & leNomDeLaTable.NomSingulier & "(_" & leNomDeLaTable.NomSingulier & ", AnOpenConneciton) > 0)" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End If" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Return resultat" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+
+                            End If
 
                             '************************************************************************************
                             'Création de la fonction Save lui-même
                             '************************************************************************************
 
-                            uneClasse &= getNumberTab(1) & "Public Function Save() As Boolean" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "If (Not BooIsSaved) Then" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "BooIsSaved = " & leNomDeLaTable.ClassName & ".Save" & leNomDeLaTable.NomSingulier & "(me)" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "End If" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "Return BooIsSaved" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "" & vbCrLf
+                            If (tbl.IsTable) Then
+
+                                uneClasse &= getNumberTab(1) & "Public Function Save() As Boolean" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "If (Not BooIsSaved) Then" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "BooIsSaved = " & leNomDeLaTable.ClassName & ".Save" & leNomDeLaTable.NomSingulier & "(me)" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End If" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Return BooIsSaved" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "" & vbCrLf
+
+                            End If
 
                             uneClasse &= "" & vbCrLf
                             uneClasse &= "#End Region" & vbCrLf
