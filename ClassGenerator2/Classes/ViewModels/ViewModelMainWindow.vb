@@ -1211,6 +1211,7 @@ Public Class ViewModelMainWindow
         Dim leNomDeLaTable As TableName
 
         Dim qryDbName As String = ""
+        Dim qrySchema As String = ""
         Dim qryTblName As String = ""
         Dim qryOneField As String = ""
 
@@ -1632,14 +1633,16 @@ Public Class ViewModelMainWindow
                                 Select Case Me.TypeBaseDonnees
                                     Case databaseType.SQL_SERVER, databaseType.MYSQL, databaseType.ORACLE, databaseType.MS_ACCESS_2007_2019, databaseType.MS_ACCESS_97_2003, databaseType.MS_EXCEL, databaseType.FLAT_FILE
                                         qryDbName = db.Name
+                                        qrySchema = Schem.Name
                                         qryTblName = tbl.Name
                                     Case databaseType.POSTGRE_SQL
                                         qryDbName = """""" & db.Name & """"""
+                                        qrySchema = """""" & Schem.Name & """""".Replace(".", """"".""""")
                                         qryTblName = ("""""" & tbl.Name & """""").Replace(".", """"".""""")
                                     Case Else
 
                                 End Select                    'Création de la requête sql      
-                                sqlTables = "INSERT INTO " & qryDbName & "." & qryTblName & " ("
+                                sqlTables = "INSERT INTO " & qryDbName & "." & qrySchema & "." & qryTblName & " ("
                                 For Each col As UneColonne In listeDesColonnes
                                     sqlTables &= col.NomColonneOriginal & ", "
                                 Next
@@ -1742,7 +1745,7 @@ Public Class ViewModelMainWindow
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
 
                                 'Création de la requête sql      
-                                sqlTables = "UPDATE " & qryDbName & "." & qryTblName & " SET "
+                                sqlTables = "UPDATE " & qryDbName & "." & qrySchema & "." & qryTblName & " SET "
                                 sqlConditions = "WHERE "
                                 For Each col As UneColonne In listeDesColonnes
 
@@ -1853,7 +1856,7 @@ Public Class ViewModelMainWindow
                             uneClasse &= getNumberTab(2) & "" & vbCrLf
 
                             'Création de la requête sql      
-                            sqlTables = "SELECT COUNT(*) AS EST_EXISTANT FROM " & qryDbName & "." & qryTblName & " "
+                            sqlTables = "SELECT COUNT(*) AS EST_EXISTANT FROM " & qryDbName & "." & qrySchema & "." & qryTblName & " "
                             sqlConditions = "WHERE "
                             For Each col As UneColonne In listeDesColonnes
 
@@ -1952,7 +1955,7 @@ Public Class ViewModelMainWindow
                                 uneClasse &= getNumberTab(3) & "" & vbCrLf
 
                                 'Création de la requête sql      
-                                sqlTables = "DELETE FROM " & qryDbName & "." & qryTblName & " "
+                                sqlTables = "DELETE FROM " & qryDbName & "." & qrySchema & "." & qryTblName & " "
                                 sqlConditions = "WHERE "
                                 For Each col As UneColonne In listeDesColonnes
 
@@ -2065,7 +2068,7 @@ Public Class ViewModelMainWindow
 
                             'Création de la requête sql      
                             sqlTables = "SELECT * " &
-                                "FROM " & qryDbName & "." & qryTblName & ";"
+                                "FROM " & qryDbName & "." & qrySchema & "." & qryTblName & ";"
 
                             Select Case CType(Me.lngTypeBaseDonnees, databaseType)
                                 Case databaseType.SQL_SERVER
@@ -2179,7 +2182,7 @@ Public Class ViewModelMainWindow
 
                             'Création de la requête sql      
                             sqlTables = "SELECT * " &
-                                "FROM " & qryDbName & "." & qryTblName & " "
+                                "FROM " & qryDbName & "." & qrySchema & "." & qryTblName & " "
                             sqlConditions = "WHERE "
                             For Each col As UneColonne In listeDesColonnes
 
