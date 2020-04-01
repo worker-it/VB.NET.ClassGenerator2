@@ -380,7 +380,8 @@
                 FontFamily="Arial Black" FontSize="12"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                 VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                Command="{Binding RetrieveDBInfos}">
+                Command="{Binding RetrieveDBInfos}"
+                CommandParameter="{Binding ElementName=CbxConnection, Path=SelectedItem}">
             <Button.IsEnabled>
                 <MultiBinding Converter="{StaticResource AllTrue}">
                     <Binding ElementName="cbxDatabase" Path="IsEnabled"/>

@@ -168,6 +168,8 @@ Public Class ViewModelMainWindow
                                                                                                 End Function)
 
             OnPropertyChanged("RetrieveDBs")
+            OnPropertyChanged("RetrieveDBInfos")
+            OnPropertyChanged("CreateFiles")
             OnPropertyChanged()
         End Set
     End Property

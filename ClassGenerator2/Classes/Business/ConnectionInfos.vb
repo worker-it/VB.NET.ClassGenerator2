@@ -1117,7 +1117,7 @@ Public Class ConnectionInfos
         End If
 
         'Création de la requête sql
-        sqlTables = "UPDATE ConnectionListDB.CL_SCHEMA.TBL_CONNECTION_LIST SET CONNECTION_NAME = '" & _ConnectionInfos.ConnectionName & "', TYPE_BASE_DONNEES = " & _ConnectionInfos.TypeBaseDonnees & ", SERVER_ADDRESS_NAME = '" & _ConnectionInfos.ServerAddressName & "', TCP_PORT = " & _ConnectionInfos.TCPPort & ", DATABASE_CATALOG = " & _ConnectionInfos.DatabaseCatalog & ", SELECTED_DB = '" & _ConnectionInfos.SelectedDB & "', USERNAME = '" & _ConnectionInfos.Username & "', TRUSTED_CONNECTION = " & _ConnectionInfos.TrustedConnection & " WHERE Id = " & _ConnectionInfos.Id & ";"
+        sqlTables = "UPDATE ConnectionListDB.CL_SCHEMA.TBL_CONNECTION_LIST SET CONNECTION_NAME = '" & _ConnectionInfos.ConnectionName & "', TYPE_BASE_DONNEES = " & _ConnectionInfos.TypeBaseDonnees & ", SERVER_ADDRESS_NAME = '" & _ConnectionInfos.ServerAddressName & "', TCP_PORT = " & _ConnectionInfos.TCPPort & ", DATABASE_CATALOG = " & _ConnectionInfos.DatabaseCatalog & ", SELECTED_DB = '" & _ConnectionInfos.SelectedDB & "', USERNAME = '" & _ConnectionInfos.Username & "', TRUSTED_CONNECTION = '" & _ConnectionInfos.TrustedConnection & "' WHERE Id = " & _ConnectionInfos.Id & ";"
 
         'Création de la commande et on l'exécute
         aCommand = New SqlClient.SqlCommand(sqlTables, CType(aConn, SqlClient.SqlConnection))
