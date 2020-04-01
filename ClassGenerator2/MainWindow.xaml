@@ -89,15 +89,16 @@
 
     <Grid Margin="0,0,20,0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="35" />
-            <RowDefinition Height="35" />
-            <RowDefinition Height="35" />
-            <RowDefinition Height="35" />
-            <RowDefinition Height="35" />
-            <RowDefinition Height="35" />
-            <RowDefinition Height="35" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition  />
-            <RowDefinition Height="35" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -109,17 +110,41 @@
             <ColumnDefinition Width="0.5*" />
         </Grid.ColumnDefinitions>
 
-        <Label x:Name="lblDatabaseType" Content="Type de base de données :"
+        <Label x:Name="lblConnectionName" Content="Nom de la connection :"
                    Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
                    FontFamily="Arial Black" FontSize="16"
                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                    VerticalAlignment="Stretch" VerticalContentAlignment="Center" />
-        <ComboBox x:Name="cbxDatabaseType" Margin="2"
+        <ComboBox x:Name="CbxConnection" Margin="2"
                   Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2"
                   FontFamily="Arial Black" FontSize="16"
                   HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                   VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                  SelectedIndex="{Binding TypeBaseDonnees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                  metro:TextBoxHelper.Watermark="Connection Name"
+                  metro:TextBoxHelper.UseFloatingWatermark="True"
+                  metro:TextBoxHelper.WatermarkAlignment="Left"
+                  IsEditable="True"
+                  IsTextSearchEnabled="True"
+                  IsTextSearchCaseSensitive="False"
+                  StaysOpenOnEdit="True"
+                  DisplayMemberPath="ConnectionName"
+                  Text="{Binding SelectedConnectionName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  TextSearch.TextPath="{Binding ConnectionName}"
+                  ItemsSource="{Binding ListeConnections, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedItem="{Binding ConnectionSelectionnee}"
+                  />
+
+        <Label x:Name="lblDatabaseType" Content="Type de base de données :"
+                   Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                   FontFamily="Arial Black" FontSize="16"
+                   HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
+                   VerticalAlignment="Stretch" VerticalContentAlignment="Center" />
+        <ComboBox x:Name="cbxDatabaseType" Margin="2"
+                  Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"
+                  FontFamily="Arial Black" FontSize="16"
+                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                  VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                  SelectedIndex="{Binding ConnectionSelectionnee.TypeBaseDonnees, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <ComboBoxItem x:Name="cbiMain" >
                 Veuillez choisir ...
             </ComboBoxItem>
@@ -127,6 +152,12 @@
                 <StackPanel Orientation="Horizontal">
                     <Image Source="./Images/MSSQLServer.png" />
                     <TextBlock >MS SQL Server</TextBlock>
+                </StackPanel>
+            </ComboBoxItem>
+            <ComboBoxItem x:Name="cbiSqlServerLocalDb" Height="32" HorizontalContentAlignment="left" VerticalContentAlignment="Center"  >
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="./Images/MSSQLServer.png" />
+                    <TextBlock >MS SQL Server (LocalDB)</TextBlock>
                 </StackPanel>
             </ComboBoxItem>
             <ComboBoxItem x:Name="cbiOracle" Height="32" HorizontalContentAlignment="left" VerticalContentAlignment="Center" >
@@ -185,19 +216,20 @@
         </ComboBox>
 
         <Label x:Name="lblServer" Content="Adresse ou Nom du Serveur :"
-               Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+               Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
                FontFamily="Arial Black" FontSize="16" ToolTip="Nom ou adresse du serveur.  Inclure le nom de l'instance du serveur si nécessaire."
                HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                VerticalAlignment="Stretch" VerticalContentAlignment="Center" />
         <TextBox x:Name="tbxServer"  Margin="2"
-                 Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2"
+                 Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2"
                  FontFamily="Arial Black" FontSize="16"
                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                  VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                 metro:TextBoxHelper.SelectAllOnFocus="True">
-            <TextBox.Text>
-                <Binding Path="ServerAddresseName" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" NotifyOnValidationError="True" />
-            </TextBox.Text>
+                 metro:TextBoxHelper.Watermark="Server Address / Name"
+                 metro:TextBoxHelper.UseFloatingWatermark="True"
+                 metro:TextBoxHelper.WatermarkAlignment="Left"
+                 metro:TextBoxHelper.SelectAllOnFocus="True"
+                 Text="{Binding ConnectionSelectionnee.ServerAddressName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}">
             <!--<Validation.ErrorTemplate>
                 <ControlTemplate>
                     <Border BorderBrush="Red" BorderThickness="2">
@@ -211,7 +243,7 @@
             </Validation.ErrorTemplate>-->
         </TextBox>
         <Button x:Name="btnBrowse" Content="Browse" Margin="2"
-                Grid.Row="1" Grid.Column="5" Grid.ColumnSpan="2" 
+                Grid.Row="2" Grid.Column="5" Grid.ColumnSpan="2" 
                 FontFamily="Arial Black" FontSize="16"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                 VerticalAlignment="Stretch" VerticalContentAlignment="Center"
@@ -219,20 +251,24 @@
                 Visibility="{Binding BrowseButtonVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
 
         <Label x:Name="lblTCPPort" Content="TCP Port :"
-               Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="2"
+               Grid.Row="2" Grid.Column="4" Grid.ColumnSpan="2"
                FontFamily="Arial Black" FontSize="16"
                HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                VerticalAlignment="Stretch" VerticalContentAlignment="Center"
                Visibility="{Binding TCPPortVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"/>
         <TextBox x:Name="tbxTCPPort"  Margin="2"
-                 Grid.Row="1" Grid.Column="6" Grid.ColumnSpan="1"
+                 Grid.Row="2" Grid.Column="6" Grid.ColumnSpan="1"
                  FontFamily="Arial Black" FontSize="16"
                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                  VerticalAlignment="Stretch" VerticalContentAlignment="Center"  
-                 Visibility="{Binding TCPPortVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
-            <TextBox.Text>
-                <Binding Path="TCPPort" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" NotifyOnValidationError="True" />
-            </TextBox.Text>
+                 Visibility="{Binding TCPPortVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                 metro:TextBoxHelper.Watermark="TCP Port"
+                 metro:TextBoxHelper.UseFloatingWatermark="True"
+                 metro:TextBoxHelper.WatermarkAlignment="Left"
+                 Text="{Binding ConnectionSelectionnee.TCPPort, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True, NotifyOnValidationError=True}">
+            <!--<TextBox.Text>
+                <Binding ElementName="ConnectionSelectionnee" Path="TCPPort" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" NotifyOnValidationError="True" />
+            </TextBox.Text>-->
             <!--<Validation.ErrorTemplate>
                 <ControlTemplate>
                     <Border BorderBrush="Red" BorderThickness="2">
@@ -247,21 +283,24 @@
         </TextBox>
 
         <Label x:Name="lblUsername" Content="Nom d'usager :"
-                   Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                   Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
                    FontFamily="Arial Black" FontSize="16"
                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                    VerticalAlignment="Stretch" VerticalContentAlignment="Center" 
                    IsEnabled="{Binding ElementName=chkTrustedConnection, Path=IsChecked, Converter={StaticResource InverseBool}}" />
         <TextBox x:Name="tbxUsername" Margin="2"
-                     Grid.Row="2" Grid.Column="2" Grid.ColumnSpan="2"
-                     FontFamily="Arial Black" FontSize="16"
-                     HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
-                     VerticalAlignment="Stretch" VerticalContentAlignment="Center" 
-                     IsEnabled="{Binding ElementName=chkTrustedConnection, Path=IsChecked, Converter={StaticResource InverseBool}}"
-                     >
-            <TextBox.Text>
+                 Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2"
+                 FontFamily="Arial Black" FontSize="16"
+                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
+                 VerticalAlignment="Stretch" VerticalContentAlignment="Center" 
+                 IsEnabled="{Binding ElementName=chkTrustedConnection, Path=IsChecked, Converter={StaticResource InverseBool}}"
+                 metro:TextBoxHelper.Watermark="UserName"
+                 metro:TextBoxHelper.UseFloatingWatermark="True"
+                 metro:TextBoxHelper.WatermarkAlignment="Left"
+                 Text="{Binding ConnectionSelectionnee.Username, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" >
+            <!--<TextBox.Text>
                 <Binding Path="Username" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" ValidatesOnDataErrors="True" NotifyOnValidationError="True" />
-            </TextBox.Text>
+            </TextBox.Text>-->
             <!--<Validation.ErrorTemplate>
                 <ControlTemplate>
                     <Border BorderBrush="Red" BorderThickness="2">
@@ -276,14 +315,14 @@
         </TextBox>
 
         <Label x:Name="lblPassword" Content="Mot de passe :"
-                   Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+                   Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
                    FontFamily="Arial Black" FontSize="16"
                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                    VerticalAlignment="Stretch" VerticalContentAlignment="Center" 
                    IsEnabled="{Binding ElementName=chkTrustedConnection, Path=IsChecked, Converter={StaticResource InverseBool}}" />
         <PasswordBox x:Name="tbxPassword" Margin="2"
                      PasswordChar="*" 
-                     Grid.Row="3" Grid.Column="2" Grid.ColumnSpan="2"
+                     Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="2"
                      FontFamily="Arial Black" FontSize="16"
                      HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                      VerticalAlignment="Stretch" VerticalContentAlignment="Center"
@@ -296,22 +335,22 @@
         </PasswordBox>
 
         <Label x:Name="lblTrustedConnection" Content="Connection Sécurisée :"
-                   Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
+                   Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
                    FontFamily="Arial Black" FontSize="16"
                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                    VerticalAlignment="Stretch" VerticalContentAlignment="Center" 
                   Visibility="{Binding ElementName=cbxDatabaseType, Path=SelectedIndex, Converter={StaticResource Equals1}}"  />
         <CheckBox x:Name="chkTrustedConnection" Margin="2"
                   Content="" FlowDirection="LeftToRight" 
-                  IsChecked="{Binding TrustedConnection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                  Grid.Row="4" Grid.Column="2" Grid.ColumnSpan="1"
+                  IsChecked="{Binding ConnectionSelectionnee.TrustedConnection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                  Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="1"
                   FontFamily="Arial Black" FontSize="16"
                   HorizontalAlignment="Right" HorizontalContentAlignment="Right"
                   VerticalAlignment="Stretch" VerticalContentAlignment="Center"
                   Visibility="{Binding ElementName=cbxDatabaseType, Path=SelectedIndex, Converter={StaticResource Equals1}}" />
 
         <Button x:Name="btnRetrieveDbs" Content="Load databases"
-                Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,2,5,2"
+                Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,2,5,2"
                 FontFamily="Arial Black" FontSize="12"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                 VerticalAlignment="Stretch" VerticalContentAlignment="Center"
@@ -319,23 +358,25 @@
                 CommandParameter="{Binding ElementName=tbxPassword}"/>
 
         <Label x:Name="lblDatabase" Content="Base de données / Catalogue :"
-                   Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                   Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2"
                    FontFamily="Arial Black" FontSize="16"
                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                    VerticalAlignment="Stretch" VerticalContentAlignment="Center" />
         <ComboBox x:Name="cbxDatabase" Margin="2" 
-                  Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="2"
+                  Grid.Row="7" Grid.Column="2" Grid.ColumnSpan="2"
                   FontFamily="Arial Black" FontSize="16"
                   HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                   VerticalAlignment="Stretch" VerticalContentAlignment="Center" 
-                  IsEditable="True" 
+                  metro:TextBoxHelper.Watermark="Database Name"
+                  metro:TextBoxHelper.UseFloatingWatermark="True"
+                  metro:TextBoxHelper.WatermarkAlignment="Left"
                   IsEnabled="{Binding ElementName=cbxDatabaseType, Path=SelectedIndex}"
-                  ItemsSource="{Binding ListeDesBaseDeDonnees, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                  SelectedIndex="{Binding DatabaseCatalog, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" 
-                  SelectedValue="{Binding SelectedDB, Mode=OneWayToSource}"/>
+                  ItemsSource="{Binding ConnectionSelectionnee.ListeDesBaseDeDonnees, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                  SelectedIndex="{Binding ConnectionSelectionnee.DatabaseCatalog, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True, NotifyOnValidationError=True}" 
+                  SelectedValue="{Binding ConnectionSelectionnee.SelectedDB, Mode=OneWayToSource}"/>
 
         <Button x:Name="btnRetrieveDbInfos" Content="Retrieve Db Infos"
-                Grid.Row="6" Grid.Column="5" Grid.ColumnSpan="2" Margin="5,2,5,2"
+                Grid.Row="7" Grid.Column="5" Grid.ColumnSpan="2" Margin="5,2,5,2"
                 FontFamily="Arial Black" FontSize="12"
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                 VerticalAlignment="Stretch" VerticalContentAlignment="Center"
@@ -349,11 +390,11 @@
         </Button>
         
         <TreeView Name="tree" 
-                  Grid.Row="7" Grid.RowSpan="1"
+                  Grid.Row="8" Grid.RowSpan="1"
                   Grid.Column="1" Grid.ColumnSpan="5"
                   Margin="5" 
                   Background="Transparent" BorderBrush="{StaticResource AccentBaseColorBrush}" BorderThickness="2"
-                  ItemsSource="{Binding ListeTablesEtChamps, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+                  ItemsSource="{Binding ConnectionSelectionnee.ListeTablesEtChamps, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
 
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Childrens}" >
@@ -372,7 +413,7 @@
         </TreeView>
         
         <Button x:Name="btnCreateClasses" Content="Créer les classes"
-                Grid.Row="8" Grid.Column="2" Grid.ColumnSpan="2" Margin="2" 
+                Grid.Row="9" Grid.Column="2" Grid.ColumnSpan="2" Margin="2" 
                 FontFamily="Arial Black" FontSize="12"
                 HorizontalAlignment="Center" Width="150" HorizontalContentAlignment="Center"
                 VerticalAlignment="Stretch" VerticalContentAlignment="Center" 

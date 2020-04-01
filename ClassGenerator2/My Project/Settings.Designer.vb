@@ -88,6 +88,17 @@ Partial Friend NotInheritable Class MySettings
             Me("NOM_PROGRAMMEUR") = value
         End Set
     End Property
+    
+    <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
+     Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+     Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
+     Global.System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDb)\MSSQLLocalDB;Initial Catalog=ConnectionListDB;Persist Secur"& _ 
+        "ity Info=True;User ID=ConnectionList;Password=X043rMiVpOlbAlGT9UKZ")>  _
+    Public ReadOnly Property LocalDB_ConnectionListDB() As String
+        Get
+            Return CType(Me("LocalDB_ConnectionListDB"),String)
+        End Get
+    End Property
 End Class
 
 Namespace My
