@@ -383,7 +383,7 @@ Public Class ConnectionInfos
             strPassword = pwdbox.Password
             pwdbox = Nothing
 
-            If (strPassword <> String.Empty) Then
+            If (strPassword <> String.Empty) Or (Me.TrustedConnection) Then
 
                 strAnEventLogger.writeLog("Initiation de la recherche des bases de données", "", EventLogEntryType.Information)
                 If (Me.ServerAddressName <> "") And (((Me.Username <> "") And (Me.strPassword <> "")) Or (Me.TrustedConnection)) Then
@@ -719,12 +719,12 @@ Public Class ConnectionInfos
                 cnxSchemas.Open()
 
                 'Création de la requête sql pour les schemas
-                sqlSchemas = "SELECT " & Me.SelectedDB & ".INFORMATION_SCHEMA.SCHEMATA.SCHEMA_NAME " &
-                             "FROM " & Me.SelectedDB & ".INFORMATION_SCHEMA.SCHEMATA " &
-                             "WHERE (" & Me.SelectedDB & ".INFORMATION_SCHEMA.SCHEMATA.SCHEMA_NAME<>'guest') AND " &
-                                   "(" & Me.SelectedDB & ".INFORMATION_SCHEMA.SCHEMATA.SCHEMA_NAME<>'sys') AND " &
-                                   "(left(" & Me.SelectedDB & ".information_schema.schemata.schema_name,3)<>'db_') and " &
-                                   "(" & Me.SelectedDB & ".INFORMATION_SCHEMA.SCHEMATA.SCHEMA_NAME<>'INFORMATION_SCHEMA') " &
+                sqlSchemas = "SELECT [" & Me.SelectedDB & "].INFORMATION_SCHEMA.SCHEMATA.SCHEMA_NAME " &
+                             "FROM [" & Me.SelectedDB & "].INFORMATION_SCHEMA.SCHEMATA " &
+                             "WHERE ([" & Me.SelectedDB & "].INFORMATION_SCHEMA.SCHEMATA.SCHEMA_NAME<>'guest') AND " &
+                                   "([" & Me.SelectedDB & "].INFORMATION_SCHEMA.SCHEMATA.SCHEMA_NAME<>'sys') AND " &
+                                   "(left([" & Me.SelectedDB & "].information_schema.schemata.schema_name,3)<>'db_') and " &
+                                   "([" & Me.SelectedDB & "].INFORMATION_SCHEMA.SCHEMATA.SCHEMA_NAME<>'INFORMATION_SCHEMA') " &
                              "ORDER BY 1;"
 
                 'Création de la commande et on l'instancie (sql)       
@@ -741,9 +741,9 @@ Public Class ConnectionInfos
                     cnxTables.ConnectionString = cnxstr
                     cnxTables.Open()
 
-                    sqlTables = "SELECT " & Me.SelectedDB & ".INFORMATION_SCHEMA.TABLES.TABLE_NAME " &
-                                "FROM " & Me.SelectedDB & ".INFORMATION_SCHEMA.TABLES " &
-                                "WHERE " & Me.SelectedDB & ".INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA='" & dtrSchemas.Item("SCHEMA_NAME").ToString() & "' " &
+                    sqlTables = "SELECT [" & Me.SelectedDB & "].INFORMATION_SCHEMA.TABLES.TABLE_NAME " &
+                                "FROM [" & Me.SelectedDB & "].INFORMATION_SCHEMA.TABLES " &
+                                "WHERE [" & Me.SelectedDB & "].INFORMATION_SCHEMA.TABLES.TABLE_SCHEMA='" & dtrSchemas.Item("SCHEMA_NAME").ToString() & "' " &
                                 "ORDER BY 1;"
 
                     'Création de la commande et on l'instancie (sql)       
@@ -761,12 +761,12 @@ Public Class ConnectionInfos
                         cnxColonnes.Open()
 
                         'Création de la requête sql      
-                        sqlColonnes = "SELECT " & Me.SelectedDB & ".INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME, " &
-                                                  Me.SelectedDB & ".INFORMATION_SCHEMA.COLUMNS.DATA_TYPE, " &
+                        sqlColonnes = "SELECT [" & Me.SelectedDB & "].INFORMATION_SCHEMA.COLUMNS.COLUMN_NAME, " &
+                                                  "[" & Me.SelectedDB & "].INFORMATION_SCHEMA.COLUMNS.DATA_TYPE, " &
                                                   "CONSTRAINTS_COLUMNS.CONSTRAINT_TYPE " &
-                                        "FROM " & Me.SelectedDB & ".INFORMATION_SCHEMA.COLUMNS LEFT JOIN " &
-                                            "(" & Me.SelectedDB & ".INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE LEFT JOIN (SELECT * " &
-                                                                                                                            "FROM " & Me.SelectedDB & ".INFORMATION_SCHEMA.TABLE_CONSTRAINTS " &
+                                        "FROM [" & Me.SelectedDB & "].INFORMATION_SCHEMA.COLUMNS LEFT JOIN " &
+                                            "([" & Me.SelectedDB & "].INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE LEFT JOIN (SELECT * " &
+                                                                                                                            "FROM [" & Me.SelectedDB & "].INFORMATION_SCHEMA.TABLE_CONSTRAINTS " &
                                                                                                                             "WHERE CONSTRAINT_TYPE='PRIMARY KEY') AS CONSTRAINTS_COLUMNS ON " &
                                             "CONSTRAINT_COLUMN_USAGE.TABLE_SCHEMA=CONSTRAINTS_COLUMNS.TABLE_SCHEMA And " &
                                             "CONSTRAINT_COLUMN_USAGE.TABLE_NAME=CONSTRAINTS_COLUMNS.TABLE_NAME And " &
@@ -1239,9 +1239,11 @@ Public Class ConnectionInfos
                 End If
             Case databaseType.SQL_SERVER_LOCALDB
                 If (Me.TrustedConnection) Then
-                    cnctstr = "Server=" & Me.ServerAddressName & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Trusted_Connection=yes;"
+                    'cnctstr = "Server=" & Me.ServerAddressName & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Trusted_Connection=yes;"
+                    cnctstr = "Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" & Me.ServerAddressName & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Integrated Security=True;"
                 Else
-                    cnctstr = "Server=" & Me.ServerAddressName & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Uid=" & Me.Username & ";Pwd=" & Me.strPassword & ";"
+                    'cnctstr = "Server=" & Me.ServerAddressName & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Uid=" & Me.Username & ";Pwd=" & Me.strPassword & ";"
+                    cnctstr = "Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" & Me.ServerAddressName & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Uid=" & Me.Username & ";Pwd=" & Me.strPassword & ";"
                 End If
             Case databaseType.ORACLE
                 If (Me.TrustedConnection) Then

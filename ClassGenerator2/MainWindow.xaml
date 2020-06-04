@@ -26,6 +26,11 @@
 
     <metro:MetroWindow.Resources>
 
+        <x:Array x:Key="ListeDeNombres" Type="{x:Type sys:Int32}">
+            <sys:Int32>1</sys:Int32>
+            <sys:Int32>2</sys:Int32>
+        </x:Array>
+
         <!-- ////////////////////////////////////////// -->
         <!-- ////////////////////////////////////////// -->
         <!-- Styles -->
@@ -66,7 +71,7 @@
         <converters:MultipleBoolean x:Key="AllTrue" OnlyAnd="True" />
 
         <converters:VisibilityFromIntegerV2 x:Key="Equals1" number="1" collapsed="False" />
-
+        <converters:VisibilityFromListIntegerV2 x:Key="Equals1Or2" numbers="{StaticResource ListeDeNombres}" collapsed="False" />
 
     </metro:MetroWindow.Resources>
 
@@ -225,7 +230,7 @@
                  FontFamily="Arial Black" FontSize="16"
                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                  VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                 metro:TextBoxHelper.Watermark="Server Address / Name"
+                 metro:TextBoxHelper.Watermark="Server Address / Name / File Name"
                  metro:TextBoxHelper.UseFloatingWatermark="True"
                  metro:TextBoxHelper.WatermarkAlignment="Left"
                  metro:TextBoxHelper.SelectAllOnFocus="True"
@@ -339,7 +344,7 @@
                    FontFamily="Arial Black" FontSize="16"
                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Right"
                    VerticalAlignment="Stretch" VerticalContentAlignment="Center" 
-                  Visibility="{Binding ElementName=cbxDatabaseType, Path=SelectedIndex, Converter={StaticResource Equals1}}"  />
+                  Visibility="{Binding ElementName=cbxDatabaseType, Path=SelectedIndex, Converter={StaticResource Equals1Or2}}"  />
         <CheckBox x:Name="chkTrustedConnection" Margin="2"
                   Content="" FlowDirection="LeftToRight" 
                   IsChecked="{Binding ConnectionSelectionnee.TrustedConnection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -347,7 +352,7 @@
                   FontFamily="Arial Black" FontSize="16"
                   HorizontalAlignment="Right" HorizontalContentAlignment="Right"
                   VerticalAlignment="Stretch" VerticalContentAlignment="Center"
-                  Visibility="{Binding ElementName=cbxDatabaseType, Path=SelectedIndex, Converter={StaticResource Equals1}}" />
+                  Visibility="{Binding ElementName=cbxDatabaseType, Path=SelectedIndex, Converter={StaticResource Equals1Or2}}" />
 
         <Button x:Name="btnRetrieveDbs" Content="Load databases"
                 Grid.Row="6" Grid.Column="2" Grid.ColumnSpan="2" Margin="5,2,5,2"
