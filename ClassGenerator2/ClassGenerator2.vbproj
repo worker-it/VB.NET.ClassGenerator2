@@ -280,6 +280,11 @@
     <Compile Include="Classes\Business\Validator.vb" />
     <Compile Include="Classes\RelayCommand.vb" />
     <Compile Include="Classes\ViewModels\ViewModelPreferences.vb" />
+    <Compile Include="ConnectionListDataSet.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConnectionListDataSet.xsd</DependentUpon>
+    </Compile>
     <Compile Include="windows\Preferences.xaml.vb">
       <DependentUpon>Preferences.xaml</DependentUpon>
     </Compile>
@@ -343,6 +348,17 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
     </EmbeddedResource>
+    <None Include="ConnectionListDataSet.xsc">
+      <DependentUpon>ConnectionListDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="ConnectionListDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>ConnectionListDataSet.Designer.vb</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ConnectionListDataSet.xss">
+      <DependentUpon>ConnectionListDataSet.xsd</DependentUpon>
+    </None>
     <None Include="My Project\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
@@ -371,15 +387,6 @@
     <Resource Include="Images\PostGreSQL.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Database\ConnectionList.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Database\ConnectionList_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>ConnectionList.mdf</DependentUpon>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6.1">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.6.1 %28x86 and x64%29</ProductName>
@@ -390,6 +397,15 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Database\ConnectionList.mdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Database\ConnectionList_log.ldf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>ConnectionList.mdf</DependentUpon>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

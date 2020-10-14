@@ -92,11 +92,11 @@ Partial Friend NotInheritable Class MySettings
     <Global.System.Configuration.ApplicationScopedSettingAttribute(),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.Configuration.SpecialSettingAttribute(Global.System.Configuration.SpecialSetting.ConnectionString),  _
-     Global.System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDb)\MSSQLLocalDB;Initial Catalog=ConnectionListDB;Persist Secur"& _ 
-        "ity Info=True;User ID=ConnectionList;Password=X043rMiVpOlbAlGT9UKZ")>  _
-    Public ReadOnly Property LocalDB_ConnectionListDB() As String
+     Global.System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database\Conn"& _ 
+        "ectionList.mdf;Integrated Security=True")>  _
+    Public ReadOnly Property ConnectionListConnectionString() As String
         Get
-            Return CType(Me("LocalDB_ConnectionListDB"),String)
+            Return CType(Me("ConnectionListConnectionString"),String)
         End Get
     End Property
 End Class

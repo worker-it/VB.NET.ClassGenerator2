@@ -92,7 +92,6 @@ Public Class ConnectionInfos
         FLAT_FILE = 9
     End Enum
 
-    Public Const OLEDB_CONN_STRING = "Server=(LocalDb)\MSSQLLocalDB;Database=ConnectionListDB;Uid=ConnectionList;Pwd=X043rMiVpOlbAlGT9UKZ;"
 
 #End Region
     '************************************************************************************
@@ -1071,14 +1070,14 @@ Public Class ConnectionInfos
         If (AnOpenConneciton Is Nothing) Then
             'Ouverture de la connection SQL
             aConn = New SqlClient.SqlConnection()
-            aConn.ConnectionString = OLEDB_CONN_STRING
+            aConn.ConnectionString = My.Settings.ConnectionListConnectionString
             aConn.Open()
         Else
             aConn = AnOpenConneciton
         End If
 
         'Création de la requête sql
-        sqlTables = "INSERT INTO ConnectionListDB.CL_SCHEMA.TBL_CONNECTION_LIST (CONNECTION_NAME, TYPE_BASE_DONNEES, SERVER_ADDRESS_NAME, TCP_PORT, DATABASE_CATALOG, SELECTED_DB, USERNAME, TRUSTED_CONNECTION) VALUES ('" & _ConnectionInfos.ConnectionName & "', " & _ConnectionInfos.TypeBaseDonnees & ", '" & _ConnectionInfos.ServerAddressName & "', " & _ConnectionInfos.TCPPort & ", " & _ConnectionInfos.DatabaseCatalog & ", '" & _ConnectionInfos.SelectedDB & "', '" & _ConnectionInfos.Username & "', " & If(_ConnectionInfos.TrustedConnection, 1, 0) & ");"
+        sqlTables = "INSERT INTO dbo.TBL_CONNECTION_LIST (CONNECTION_NAME, TYPE_BASE_DONNEES, SERVER_ADDRESS_NAME, TCP_PORT, DATABASE_CATALOG, SELECTED_DB, USERNAME, TRUSTED_CONNECTION) VALUES ('" & _ConnectionInfos.ConnectionName & "', " & _ConnectionInfos.TypeBaseDonnees & ", '" & _ConnectionInfos.ServerAddressName & "', " & _ConnectionInfos.TCPPort & ", " & _ConnectionInfos.DatabaseCatalog & ", '" & _ConnectionInfos.SelectedDB & "', '" & _ConnectionInfos.Username & "', " & If(_ConnectionInfos.TrustedConnection, 1, 0) & ");"
 
         'Création de la commande et on l'exécute
         aCommand = New SqlClient.SqlCommand(sqlTables, CType(aConn, SqlClient.SqlConnection))
@@ -1110,14 +1109,14 @@ Public Class ConnectionInfos
         If (AnOpenConneciton Is Nothing) Then
             'Ouverture de la connection SQL
             aConn = New SqlClient.SqlConnection()
-            aConn.ConnectionString = OLEDB_CONN_STRING
+            aConn.ConnectionString = My.Settings.ConnectionListConnectionString
             aConn.Open()
         Else
             aConn = AnOpenConneciton
         End If
 
         'Création de la requête sql
-        sqlTables = "UPDATE ConnectionListDB.CL_SCHEMA.TBL_CONNECTION_LIST SET CONNECTION_NAME = '" & _ConnectionInfos.ConnectionName & "', TYPE_BASE_DONNEES = " & _ConnectionInfos.TypeBaseDonnees & ", SERVER_ADDRESS_NAME = '" & _ConnectionInfos.ServerAddressName & "', TCP_PORT = " & _ConnectionInfos.TCPPort & ", DATABASE_CATALOG = " & _ConnectionInfos.DatabaseCatalog & ", SELECTED_DB = '" & _ConnectionInfos.SelectedDB & "', USERNAME = '" & _ConnectionInfos.Username & "', TRUSTED_CONNECTION = '" & _ConnectionInfos.TrustedConnection & "' WHERE Id = " & _ConnectionInfos.Id & ";"
+        sqlTables = "UPDATE dbo.TBL_CONNECTION_LIST SET CONNECTION_NAME = '" & _ConnectionInfos.ConnectionName & "', TYPE_BASE_DONNEES = " & _ConnectionInfos.TypeBaseDonnees & ", SERVER_ADDRESS_NAME = '" & _ConnectionInfos.ServerAddressName & "', TCP_PORT = " & _ConnectionInfos.TCPPort & ", DATABASE_CATALOG = " & _ConnectionInfos.DatabaseCatalog & ", SELECTED_DB = '" & _ConnectionInfos.SelectedDB & "', USERNAME = '" & _ConnectionInfos.Username & "', TRUSTED_CONNECTION = '" & _ConnectionInfos.TrustedConnection & "' WHERE Id = " & _ConnectionInfos.Id & ";"
 
         'Création de la commande et on l'exécute
         aCommand = New SqlClient.SqlCommand(sqlTables, CType(aConn, SqlClient.SqlConnection))
@@ -1149,14 +1148,14 @@ Public Class ConnectionInfos
         If (AnOpenConneciton Is Nothing) Then
             'Ouverture de la connection SQL
             aConn = New SqlClient.SqlConnection()
-            aConn.ConnectionString = OLEDB_CONN_STRING
+            aConn.ConnectionString = My.Settings.ConnectionListConnectionString
             aConn.Open()
         Else
             aConn = AnOpenConneciton
         End If
 
         'Création de la requête sql
-        sqlTables = "SELECT COUNT(*) AS EST_EXISTANT FROM ConnectionListDB.CL_SCHEMA.TBL_CONNECTION_LIST WHERE Id = " & _ConnectionInfos.Id & ";"
+        sqlTables = "SELECT COUNT(*) AS EST_EXISTANT FROM dbo.TBL_CONNECTION_LIST WHERE Id = " & _ConnectionInfos.Id & ";"
 
         'Création de la commande et on l'exécute
         aCommand = New SqlClient.SqlCommand(sqlTables, CType(aConn, SqlClient.SqlConnection))
@@ -1193,14 +1192,14 @@ Public Class ConnectionInfos
             If (AnOpenConneciton Is Nothing) Then
                 'Ouverture de la connection SQL
                 aConn = New SqlClient.SqlConnection()
-                aConn.ConnectionString = OLEDB_CONN_STRING
+                aConn.ConnectionString = My.Settings.ConnectionListConnectionString
                 aConn.Open()
             Else
                 aConn = AnOpenConneciton
             End If
 
             'Création de la requête sql
-            sqlTables = "DELETE FROM ConnectionListDB.CL_SCHEMA.TBL_CONNECTION_LIST WHERE Id = " & _ConnectionInfos.Id & ";"
+            sqlTables = "DELETE FROM dbo.TBL_CONNECTION_LIST WHERE Id = " & _ConnectionInfos.Id & ";"
 
             'Création de la commande et on l'exécute
             aCommand = New SqlClient.SqlCommand(sqlTables, CType(aConn, SqlClient.SqlConnection))
@@ -1691,7 +1690,7 @@ Public Class ConnectionInfos
 
                             uneClasse &= "" & vbCrLf
                             If (cnxstr <> "") Then
-                                uneClasse &= "Public Const OLEDB_CONN_STRING = """ & cnxstr & """" & vbCrLf
+                                uneClasse &= "Public Const My.Settings.ConnectionListConnectionString = """ & cnxstr & """" & vbCrLf
                             End If
                             uneClasse &= "" & vbCrLf
 
@@ -1963,7 +1962,7 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2076,7 +2075,7 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2194,7 +2193,7 @@ Public Class ConnectionInfos
                             uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                             uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
+                            uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                             uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2300,7 +2299,7 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2394,7 +2393,7 @@ Public Class ConnectionInfos
                             uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                             uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
+                            uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                             uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2528,7 +2527,7 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = OLEDB_CONN_STRING" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2756,17 +2755,21 @@ Public Class ConnectionInfos
         Dim aCommand As DbCommand
         Dim aDtr As DbDataReader
 
+        Dim logger As New EventLogger("C:\temp", "GetAllConnectionInfos.log", "MainWindow", ".", "MainWindow", True)
+        logger.writeLog("On s'est rendu ici facilement", Nothing, EventLogEntryType.Information)
+        logger.Dispose()
+
         If (AnOpenConneciton Is Nothing) Then
             'Ouverture de la connection SQL
             aConn = New SqlClient.SqlConnection()
-            aConn.ConnectionString = OLEDB_CONN_STRING
+            aConn.ConnectionString = My.Settings.ConnectionListConnectionString
             aConn.Open()
         Else
             aConn = AnOpenConneciton
         End If
 
         'Création de la requête sql
-        sqlTables = "SELECT * FROM ConnectionListDB.CL_SCHEMA.TBL_CONNECTION_LIST;"
+        sqlTables = "SELECT * FROM dbo.TBL_CONNECTION_LIST;"
 
         'Création de la commande et on l'instancie (sql)
         aCommand = New SqlClient.SqlCommand(sqlTables, CType(aConn, SqlClient.SqlConnection))
@@ -2823,14 +2826,14 @@ Public Class ConnectionInfos
         If (AnOpenConneciton Is Nothing) Then
             'Ouverture de la connection SQL
             aConn = New SqlClient.SqlConnection()
-            aConn.ConnectionString = OLEDB_CONN_STRING
+            aConn.ConnectionString = My.Settings.ConnectionListConnectionString
             aConn.Open()
         Else
             aConn = AnOpenConneciton
         End If
 
         'Création de la requête sql
-        sqlTables = "SELECT * FROM ConnectionListDB.CL_SCHEMA.TBL_CONNECTION_LIST WHERE Id = " & _Id & ";"
+        sqlTables = "SELECT * FROM dbo.TBL_CONNECTION_LIST WHERE Id = " & _Id & ";"
 
         'Création de la commande et on l'instancie (sql)
         aCommand = New SqlClient.SqlCommand(sqlTables, CType(aConn, SqlClient.SqlConnection))

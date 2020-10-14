@@ -11,13 +11,13 @@
     <Setting Name="NOM_PROGRAMMEUR" Type="System.String" Scope="User">
       <Value Profile="(Default)">Jean-Claude Frigon</Value>
     </Setting>
-    <Setting Name="LocalDB_ConnectionListDB" Type="(Connection string)" Scope="Application">
+    <Setting Name="ConnectionListConnectionString" Type="(Connection string)" Scope="Application">
       <DesignTimeValue Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;SerializableConnectionString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
-  &lt;ConnectionString&gt;Data Source=(LocalDb)\MSSQLLocalDB;Initial Catalog=ConnectionListDB;Persist Security Info=True;User ID=ConnectionList;Password=X043rMiVpOlbAlGT9UKZ&lt;/ConnectionString&gt;
+  &lt;ConnectionString&gt;Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database\ConnectionList.mdf;Integrated Security=True&lt;/ConnectionString&gt;
   &lt;ProviderName&gt;System.Data.SqlClient&lt;/ProviderName&gt;
 &lt;/SerializableConnectionString&gt;</DesignTimeValue>
-      <Value Profile="(Default)">Data Source=(LocalDb)\MSSQLLocalDB;Initial Catalog=ConnectionListDB;Persist Security Info=True;User ID=ConnectionList;Password=X043rMiVpOlbAlGT9UKZ</Value>
+      <Value Profile="(Default)">Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Database\ConnectionList.mdf;Integrated Security=True</Value>
     </Setting>
   </Settings>
 </SettingsFile>
