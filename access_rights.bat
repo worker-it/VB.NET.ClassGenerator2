@@ -1,0 +1,1 @@
+icacls "C:\Program Files\itworker\Class Generator\Database" /Grant Everyone:M

@@ -1690,7 +1690,7 @@ Public Class ConnectionInfos
 
                             uneClasse &= "" & vbCrLf
                             If (cnxstr <> "") Then
-                                uneClasse &= "Public Const My.Settings.ConnectionListConnectionString = """ & cnxstr & """" & vbCrLf
+                                uneClasse &= "Public Const ConnectionString = """ & cnxstr & """" & vbCrLf
                             End If
                             uneClasse &= "" & vbCrLf
 
@@ -1864,6 +1864,13 @@ Public Class ConnectionInfos
                             uneClasse &= getNumberTab(1) & "'------- ------" & vbCrLf
                             uneClasse &= "" & vbCrLf
 
+                            uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "'Section publique" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
+                            uneClasse &= "" & vbCrLf
+
                             '************************************************************************************
                             'Création de la fonction insert de la classe
                             '************************************************************************************
@@ -1962,7 +1969,7 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = ConnectionString" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2021,11 +2028,11 @@ Public Class ConnectionInfos
                                         sqlConditions &= col.NomColonneOriginal & " = "
                                         Select Case col.TypeDeDonnees
                                             Case "Long", "Integer", "Byte", "Double", "Decimal"
-                                                sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
+                                                sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "" AND "
                                             Case "Char", "DateDate", "String"
-                                                sqlConditions &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""', "
+                                                sqlConditions &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""' AND "
                                             Case Else
-                                                sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
+                                                sqlConditions &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "" AND "
                                         End Select
                                     Else
 
@@ -2035,11 +2042,11 @@ Public Class ConnectionInfos
                                         Else
                                             Select Case col.TypeDeDonnees
                                                 Case "Long", "Integer", "Byte", "Double", "Decimal"
-                                                    sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
+                                                    sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "" AND "
                                                 Case "Char", "DateDate", "String"
-                                                    sqlTables &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""', "
+                                                    sqlTables &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""' AND "
                                                 Case Else
-                                                    sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
+                                                    sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "" AND "
                                             End Select
                                         End If
 
@@ -2075,7 +2082,7 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = ConnectionString" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2114,7 +2121,7 @@ Public Class ConnectionInfos
                             uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
                             uneClasse &= getNumberTab(2) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
                             uneClasse &= getNumberTab(2) & "''' <returns>Retourne Vrai si l'objet existe dans la base de données ou False s'il n'existe pas.</returns>" & vbCrLf
-                            uneClasse &= getNumberTab(1) & "Private Shared Function " & leNomDeLaTable.NomSingulier & "Exists(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Boolean" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "Public Shared Function " & leNomDeLaTable.NomSingulier & "Exists(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Boolean" & vbCrLf
                             uneClasse &= getNumberTab(2) & "" & vbCrLf
                             uneClasse &= getNumberTab(2) & "Dim resultat As Boolean = False" & vbCrLf
                             uneClasse &= getNumberTab(2) & "" & vbCrLf
@@ -2193,7 +2200,7 @@ Public Class ConnectionInfos
                             uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                             uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
+                            uneClasse &= getNumberTab(3) & "aConn.ConnectionString = ConnectionString" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                             uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2234,7 +2241,7 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(1) & "''' </summary>" & vbCrLf
                                 uneClasse &= getNumberTab(1) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
                                 uneClasse &= getNumberTab(1) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
-                                uneClasse &= getNumberTab(1) & "Private Shared Function Delete" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Integer" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "Public Shared Function Delete" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Integer" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Dim resultat As Integer = 0" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
@@ -2299,7 +2306,7 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = ConnectionString" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2334,14 +2341,6 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Return resultat" & vbCrLf
                                 uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
-
-                                uneClasse &= getNumberTab(1) & "" & vbCrLf
-                                uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
-                                uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
-                                uneClasse &= getNumberTab(1) & "'Section publique" & vbCrLf
-                                uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
-                                uneClasse &= getNumberTab(1) & "'------- --------" & vbCrLf
-                                uneClasse &= "" & vbCrLf
 
                             End If
 
@@ -2393,7 +2392,7 @@ Public Class ConnectionInfos
                             uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                             uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                            uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
+                            uneClasse &= getNumberTab(3) & "aConn.ConnectionString = ConnectionString" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                             uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2527,7 +2526,7 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "If (AnOpenConneciton Is Nothing) then" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "'Ouverture de la connection SQL" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = " & NewConnections & vbCrLf
-                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = My.Settings.ConnectionListConnectionString" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aConn.ConnectionString = ConnectionString" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn.Open()" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Else" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aConn = AnOpenConneciton" & vbCrLf
@@ -2640,8 +2639,8 @@ Public Class ConnectionInfos
 
                             If (tbl.IsTable) Then
 
-                                uneClasse &= getNumberTab(1) & "Public Function Save() As Boolean" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "If (Not BooIsSaved) Then" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "Public Function Save(Optional Byval whatever as Boolean = False) As Boolean" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "If (Not BooIsSaved) or (whatever) Then" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "BooIsSaved = " & leNomDeLaTable.ClassName & ".Save" & leNomDeLaTable.NomSingulier & "(me)" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "End If" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Return BooIsSaved" & vbCrLf

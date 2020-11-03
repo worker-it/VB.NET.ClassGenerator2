@@ -21,7 +21,6 @@
             </ResourceDictionary.MergedDictionaries>
 
             <local:ViewModelMainWindow x:Key="MainViewModel" />
-            <local:ViewModelPreferences x:Key="PreferencesViewModel" />
 
         </ResourceDictionary>        
     </Application.Resources>

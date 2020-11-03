@@ -80,6 +80,7 @@ Public Class ViewModelMainWindow
         'InitializeComponent()
 
         ' Add any initialization after the InitializeComponent() call.
+        strAnEventLogger.writeLog("Voilà, c'est un bon début!", "", EventLogEntryType.Information)
 
         MahApps.Metro.ThemeManager.ChangeAppStyle(Application.Current, MahApps.Metro.ThemeManager.GetAccent(My.Settings.ACCENT_COLOR), MahApps.Metro.ThemeManager.GetAppTheme(My.Settings.APPLICATION_THEME))
 
@@ -87,6 +88,8 @@ Public Class ViewModelMainWindow
         ConnectionSelectionnee = LstListeDesConnections(0)
         SelectedConnectionName = ConnectionSelectionnee.ConnectionName
         OnPropertyChanged("SelectedConnectionName")
+
+        strAnEventLogger.writeLog("Bon, on a passé la première étape!", "", EventLogEntryType.Information)
 
     End Sub
 
@@ -142,6 +145,7 @@ Public Class ViewModelMainWindow
 
     Public Property WindowTitle As String
         Get
+            strAnEventLogger.writeLog("On a lu le titre!", "", EventLogEntryType.Information)
             Return StrWindowTitle & " - V" & My.Application.Info.Version.ToString
         End Get
         Set(value As String)
@@ -152,9 +156,13 @@ Public Class ViewModelMainWindow
 
     Public Property ConnectionSelectionnee As ConnectionInfos
         Get
+            strAnEventLogger.writeLog(CiSelectedConnection.ToString(), "", EventLogEntryType.Information)
             Return CiSelectedConnection
         End Get
         Set(value As ConnectionInfos)
+
+            strAnEventLogger.writeLog("Propriété ConnectionSelectionnee!", "", EventLogEntryType.Information)
+
             CiSelectedConnection = value
 
             RcRetrieveDB = New RelayCommand(AddressOf CiSelectedConnection.BtnRetrieveDbsCommand, Function()
@@ -176,9 +184,11 @@ Public Class ViewModelMainWindow
 
     Public Property SelectedConnectionName As String
         Get
+            strAnEventLogger.writeLog(CiSelectedConnection.ConnectionName, "", EventLogEntryType.Information)
             Return CiSelectedConnection.ConnectionName
         End Get
         Set(value As String)
+            strAnEventLogger.writeLog("Remplace " & CiSelectedConnection.ConnectionName & " par " & value & ".", "", EventLogEntryType.Information)
             CiSelectedConnection.ConnectionName = value
             OnPropertyChanged()
         End Set
@@ -186,9 +196,11 @@ Public Class ViewModelMainWindow
 
     Public Property ListeConnections As ObservableCollection(Of ConnectionInfos)
         Get
+            strAnEventLogger.writeLog("Lecture de la liste des connections", "", EventLogEntryType.Information)
             Return LstListeDesConnections
         End Get
         Set(value As ObservableCollection(Of ConnectionInfos))
+            strAnEventLogger.writeLog("Changement de la liste des connections", "", EventLogEntryType.Information)
             LstListeDesConnections = value
             OnPropertyChanged()
         End Set
@@ -346,6 +358,7 @@ Public Class ViewModelMainWindow
 
     Protected Friend Sub CommandAbout(ByVal params As Object)
 
+        strAnEventLogger.writeLog("On veut voir about!", "", EventLogEntryType.Information)
         Dim bmpImg As New BitmapImage()
 
         Dim about As New AboutDialogBox.AboutDialogViewModel(My.Application.Info,
@@ -363,6 +376,7 @@ Public Class ViewModelMainWindow
     End Sub
 
     Protected Friend Sub CommandSettings(ByVal params As Object)
+        strAnEventLogger.writeLog("On veut voir les préférences!", "", EventLogEntryType.Information)
         Dim pref As New Preferences
         pref.DataContext = New ViewModelPreferences()
         pref.ShowDialog()
