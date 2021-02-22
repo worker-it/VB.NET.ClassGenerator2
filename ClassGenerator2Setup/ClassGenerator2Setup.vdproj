@@ -7602,15 +7602,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Class Generator"
-        "ProductCode" = "8:{70234B32-7C2D-47A6-912D-350E0F049939}"
-        "PackageCode" = "8:{771A9CFC-7843-4677-845D-4F7006D509D0}"
+        "ProductCode" = "8:{099A548F-F6B5-40E5-8A56-54D01B9EFF0E}"
+        "PackageCode" = "8:{5F580C5D-5E87-43A6-BF79-9C6BE6C207BA}"
         "UpgradeCode" = "8:{6279DC95-C5BE-44B8-A93A-515D77C67397}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:2.0.5"
+        "ProductVersion" = "8:2.0.6"
         "Manufacturer" = "8:itworker"
         "ARPHELPTELEPHONE" = "8:1-514-924-4816"
         "ARPHELPLINK" = "8:"
@@ -8152,7 +8152,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_757BFA2755D74937824EAB93F7969C10"
             {
-            "SourcePath" = "8:..\\ClassGenerator2\\obj\\Release\\ClassGenerator2.exe"
+            "SourcePath" = "8:..\\ClassGenerator2\\obj\\Debug\\ClassGenerator2.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_CE2D0EE8972C48BEB0B46971EB97EDF2"

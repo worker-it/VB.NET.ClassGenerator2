@@ -577,11 +577,11 @@ Public Class ConnectionInfos
     Public Sub RetrieveDBInfosCommand(ByVal params As Object)
 
         'Déclaration de la variable pour la connection      
-        Dim cnxSchemas As DbConnection
+        Dim cnxSchemas As DbConnection = Nothing
         'Déclaration de la variable pour la connection      
-        Dim cnxTables As DbConnection
+        Dim cnxTables As DbConnection = Nothing
         'Déclaration de la variable pour la connection      
-        Dim cnxColonnes As DbConnection
+        Dim cnxColonnes As DbConnection = Nothing
         'Déclaration de la variable pour la connectionstring      
         Dim cnxstr As String
         'Déclaration de la variable pour la requête      
@@ -591,17 +591,17 @@ Public Class ConnectionInfos
         'Déclaration de la variable pour la requête      
         Dim sqlColonnes As String
         'Déclaration de la variable pour la commande       
-        Dim cmdSchemas As DbCommand
+        Dim cmdSchemas As DbCommand = Nothing
         'Déclaration de la variable pour la commande       
-        Dim cmdTables As DbCommand
+        Dim cmdTables As DbCommand = Nothing
         'Déclaration de la variable pour le dataadapter
-        Dim dtrSchemas As DbDataReader
+        Dim dtrSchemas As DbDataReader = Nothing
         'Déclaration de la variable pour le dataadapter
-        Dim dtrTables As DbDataReader
+        Dim dtrTables As DbDataReader = Nothing
         'Déclaration de la variable pour la commande       
-        Dim cmdColonnes As DbCommand
+        Dim cmdColonnes As DbCommand = Nothing
         'Déclaration de la variable pour le dataadapter
-        Dim dtrColonnes As DbDataReader
+        Dim dtrColonnes As DbDataReader = Nothing
 
         listeDeClasses = New List(Of ClassCodeVb)
 
@@ -893,17 +893,19 @@ Public Class ConnectionInfos
                     cnxTables.Open()
 
                     'Création de la requête sql      
-                    sqlTables = "SELECT schemaname, tablename as object_name, table_type " &
-                                "FROM """ & Me.SelectedDB & """.""pg_catalog"".""pg_tables"" " &
-                                "WHERE schemaname='" & dtrSchemas.Item("schema_name").ToString() & "' " &
-                                "UNION ALL " &
-                                "SELECT schemaname, viewname as object_name, table_type " &
-                                "FROM """ & Me.SelectedDB & """.""pg_catalog"".""pg_views"" " &
-                                "WHERE schemaname='" & dtrSchemas.Item("schema_name").ToString() & "';"
+                    'sqlTables = "SELECT * FROM (SELECT schemaname, tablename as object_name, table_type " &
+                    '            "FROM """ & Me.SelectedDB & """.""pg_catalog"".""pg_tables"" " &
+                    '            "WHERE schemaname='" & dtrSchemas.Item("schema_name").ToString() & "' " &
+                    '            "UNION ALL " &
+                    '            "SELECT schemaname, viewname as object_name, table_type " &
+                    '            "FROM """ & Me.SelectedDB & """.""pg_catalog"".""pg_views"" " &
+                    '            "WHERE schemaname='" & dtrSchemas.Item("schema_name").ToString() & "') " &
+                    '            "ORDER BY 1,2;"
 
                     sqlTables = "SELECT table_schema AS schemaname, table_name AS object_name, table_type " &
                                 "FROM """ & Me.SelectedDB & """.""information_schema"".""tables"" " &
-                                "WHERE table_schema='" & dtrSchemas.Item("schema_name").ToString() & "';"
+                                "WHERE table_schema='" & dtrSchemas.Item("schema_name").ToString() & "' " &
+                                "ORDER BY 1, 2;"
 
                     'Création de la commande et on l'instancie (sql)       
                     cmdTables = New NpgsqlCommand(sqlTables, CType(cnxTables, NpgsqlConnection))
@@ -1204,7 +1206,7 @@ Public Class ConnectionInfos
             'Création de la commande et on l'exécute
             aCommand = New SqlClient.SqlCommand(sqlTables, CType(aConn, SqlClient.SqlConnection))
             Try
-                resultat = CType(aCommand.ExecuteScalar(), Integer)
+                resultat = CType(aCommand.ExecuteNonQuery(), Integer)
             Catch ex As Exception
                 resultat = -1
             End Try
@@ -1897,11 +1899,11 @@ Public Class ConnectionInfos
 
                             If (tbl.IsTable) Then
 
-                                uneClasse &= getNumberTab(2) & "''' <summary>" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "''' Fonction permettant d'insérer dans la table de la classe l'objet passé en paramètre." & vbCrLf
-                                uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' <summary>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' Fonction permettant d'insérer dans la table de la classe l'objet passé en paramètre." & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' </summary>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
                                 uneClasse &= getNumberTab(1) & "Private Shared Function Insert" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Integer" & vbCrLf
                                 uneClasse &= "" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Dim resultat As Integer = 0" & vbCrLf
@@ -1982,7 +1984,11 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "'Création de la commande et on l'exécute" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "aCommand = " & CommandeSQL & vbCrLf
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "resultat = aCommand.ExecuteNonQuery()" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Try" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "resultat = aCommand.ExecuteNonQuery()" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Catch ex as Exception" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "resultat = -1" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End Try" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "aCommand = Nothing" & vbCrLf
 
@@ -2005,11 +2011,11 @@ Public Class ConnectionInfos
 
                             If (tbl.IsTable) Then
 
-                                uneClasse &= getNumberTab(2) & "''' <summary>" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "''' Fonction permettant de mettre à jour l'objet passé en paramètre dans la table de la classe s'il existe." & vbCrLf
-                                uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' <summary>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' Fonction permettant de mettre à jour l'objet passé en paramètre dans la table de la classe s'il existe." & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' </summary>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' <returns>Retourne un integer représentant le nombre d'enregistrements affectés : devrait toujours être 1 ou 0</returns>" & vbCrLf
                                 uneClasse &= getNumberTab(1) & "Private Shared Function Update" & leNomDeLaTable.NomSingulier & "(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Integer" & vbCrLf
                                 uneClasse &= "" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Dim resultat As Integer = 0" & vbCrLf
@@ -2042,11 +2048,11 @@ Public Class ConnectionInfos
                                         Else
                                             Select Case col.TypeDeDonnees
                                                 Case "Long", "Integer", "Byte", "Double", "Decimal"
-                                                    sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "" AND "
+                                                    sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
                                                 Case "Char", "DateDate", "String"
-                                                    sqlTables &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""' AND "
+                                                    sqlTables &= "'"" & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & ""', "
                                                 Case Else
-                                                    sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "" AND "
+                                                    sqlTables &= """ & _" & leNomDeLaTable.NomSingulier & "." & col.VarDePropriete & " & "", "
                                             End Select
                                         End If
 
@@ -2054,7 +2060,7 @@ Public Class ConnectionInfos
 
                                 Next
 
-                                sqlTables = Strings.Left(sqlTables, sqlTables.Length - 2) & " " & Strings.Left(sqlConditions, sqlConditions.Length - 2) & ";"
+                                sqlTables = Strings.Left(sqlTables, sqlTables.Length - 2) & " " & Strings.Left(sqlConditions, sqlConditions.Length - 5) & ";"
 
                                 Select Case CType(Me.IntTypeBaseDonnees, databaseType)
                                     Case databaseType.SQL_SERVER
@@ -2095,7 +2101,11 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "'Création de la commande et on l'exécute" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "aCommand = " & CommandeSQL & vbCrLf
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "resultat = aCommand.ExecuteNonQuery()" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Try" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "resultat = aCommand.ExecuteNonQuery()" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Catch ex as Exception" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "resultat = -1" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End Try" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "aCommand = Nothing" & vbCrLf
 
@@ -2116,11 +2126,11 @@ Public Class ConnectionInfos
                             'Création de la fonction objet existe de la classe
                             '************************************************************************************
 
-                            uneClasse &= getNumberTab(2) & "''' <summary>" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' Fonction permettant de déterminer si l'objet passé en paramètre existe dans la base de données ou non." & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' <returns>Retourne Vrai si l'objet existe dans la base de données ou False s'il n'existe pas.</returns>" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "''' <summary>" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "''' Fonction permettant de déterminer si l'objet passé en paramètre existe dans la base de données ou non." & vbCrLf
+                            uneClasse &= getNumberTab(1) & "''' </summary>" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "''' <param name=""_" & leNomDeLaTable.NomSingulier & """>Un objet de type " & leNomDeLaTable.TableName & "</param>" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "''' <returns>Retourne Vrai si l'objet existe dans la base de données ou False s'il n'existe pas.</returns>" & vbCrLf
                             uneClasse &= getNumberTab(1) & "Public Shared Function " & leNomDeLaTable.NomSingulier & "Exists(ByVal _" & leNomDeLaTable.NomSingulier & " As " & leNomDeLaTable.ClassName & optionalConnection & ") As Boolean" & vbCrLf
                             uneClasse &= getNumberTab(2) & "" & vbCrLf
                             uneClasse &= getNumberTab(2) & "Dim resultat As Boolean = False" & vbCrLf
@@ -2319,9 +2329,9 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(3) & "'Création de la commande et on l'exécute" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aCommand = " & CommandeSQL & vbCrLf
                                 uneClasse &= getNumberTab(3) & "Try" & vbCrLf
-                                uneClasse &= getNumberTab(3) & "resultat =  CType(aCommand.ExecuteScalar(), Integer)" & vbCrLf
+                                uneClasse &= getNumberTab(4) & "resultat =  CType(aCommand.ExecuteNonQuery(), Integer)" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "Catch ex As Exception" & vbCrLf
-                                uneClasse &= getNumberTab(3) & "resultat = -1" & vbCrLf
+                                uneClasse &= getNumberTab(4) & "resultat = -1" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "End Try" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aCommand = Nothing" & vbCrLf
@@ -2341,6 +2351,7 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Return resultat" & vbCrLf
                                 uneClasse &= getNumberTab(1) & "End Function" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "" & vbCrLf
 
                             End If
 
@@ -2348,10 +2359,10 @@ Public Class ConnectionInfos
                             'Création de la fonction getAll objets de la classe
                             '************************************************************************************
 
-                            uneClasse &= getNumberTab(2) & "''' <summary>" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' Retourne une liste de tous les " & leNomDeLaTable.TableName & " de la table." & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "''' <returns>Retourne une liste de tous les " & leNomDeLaTable.TableName & " de la table</returns>" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "''' <summary>" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "''' Retourne une liste de tous les " & leNomDeLaTable.TableName & " de la table." & vbCrLf
+                            uneClasse &= getNumberTab(1) & "''' </summary>" & vbCrLf
+                            uneClasse &= getNumberTab(1) & "''' <returns>Retourne une liste de tous les " & leNomDeLaTable.TableName & " de la table</returns>" & vbCrLf
                             uneClasse &= getNumberTab(1) & "Public Shared Function getAll" & leNomDeLaTable.TableName & "(" & Strings.Right(optionalConnection, optionalConnection.Length - 2) & ") As List(Of " & leNomDeLaTable.ClassName & ")" & vbCrLf
                             uneClasse &= getNumberTab(2) & "" & vbCrLf
 
@@ -2406,7 +2417,11 @@ Public Class ConnectionInfos
                             uneClasse &= getNumberTab(2) & "aCommand = " & CommandeSQL & vbCrLf
                             uneClasse &= getNumberTab(2) & "" & vbCrLf
                             uneClasse &= getNumberTab(2) & "'Création du datareader (aDtr)" & vbCrLf
-                            uneClasse &= getNumberTab(2) & "aDtr = aCommand.ExecuteReader()" & vbCrLf
+                            uneClasse &= getNumberTab(2) & "Try" & vbCrLf
+                            uneClasse &= getNumberTab(3) & "aDtr = aCommand.ExecuteReader()" & vbCrLf
+                            uneClasse &= getNumberTab(2) & "Catch ex as Exception" & vbCrLf
+                            uneClasse &= getNumberTab(3) & "return = -1" & vbCrLf
+                            uneClasse &= getNumberTab(2) & "End Try" & vbCrLf
                             uneClasse &= getNumberTab(2) & "" & vbCrLf
                             uneClasse &= getNumberTab(2) & "While aDtr.Read()" & vbCrLf
                             uneClasse &= getNumberTab(2) & "" & vbCrLf
@@ -2456,10 +2471,10 @@ Public Class ConnectionInfos
 
                             If (tbl.IsTable) Then
 
-                                uneClasse &= getNumberTab(2) & "''' <summary>" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "''' Retourne une liste de tous les " & leNomDeLaTable.TableName & " de la table." & vbCrLf
-                                uneClasse &= getNumberTab(2) & "''' </summary>" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "''' <returns>Retourne une liste de tous les " & leNomDeLaTable.TableName & " de la table</returns>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' <summary>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' Retourne une liste de tous les " & leNomDeLaTable.TableName & " de la table." & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' </summary>" & vbCrLf
+                                uneClasse &= getNumberTab(1) & "''' <returns>Retourne une liste de tous les " & leNomDeLaTable.TableName & " de la table</returns>" & vbCrLf
                                 uneClasse &= getNumberTab(1) & "Public Shared Function get" & leNomDeLaTable.TableName & "FromID("
 
                                 For Each col As UneColonne In listeDesColonnes
@@ -2540,7 +2555,11 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "aCommand = " & CommandeSQL & vbCrLf
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "'Création du datareader (aDtr)" & vbCrLf
-                                uneClasse &= getNumberTab(2) & "aDtr = aCommand.ExecuteReader()" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Try" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "aDtr = aCommand.ExecuteReader()" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "Catch ex as Exception" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "return = -1" & vbCrLf
+                                uneClasse &= getNumberTab(2) & "End Try" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "While aDtr.Read()" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
