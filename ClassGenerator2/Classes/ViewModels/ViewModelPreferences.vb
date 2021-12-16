@@ -16,6 +16,7 @@
 
 Imports System.ComponentModel
 Imports System.Runtime.CompilerServices
+Imports ControlzEx.Theming
 Imports MahApps.Metro
 
 #End Region
@@ -48,6 +49,8 @@ Public Class ViewModelPreferences
     Private TmdSelectedTheme As AppThemeMenuData
     Private AcmdSelectedAccent As AccentColorMenuData
 
+    Private WdwAssociated As Preferences
+
     '------- --------
     '------- --------
     'Section publique
@@ -62,7 +65,7 @@ Public Class ViewModelPreferences
     '************************************************************************************
 #Region "Constructors"
 
-    Public Sub New()
+    Public Sub New(ByRef _WdwAssociated As Preferences)
 
         ' This call is required by the designer.
         'InitializeComponent()
@@ -70,37 +73,16 @@ Public Class ViewModelPreferences
         ' Add any initialization after the InitializeComponent() call.
 
         ' create accent color menu items for the demo
-        Me.AccentColors = ThemeManager.Accents.[Select](Function(a)
-                                                            Return New AccentColorMenuData() With {
-                                                                .Name = a.Name,
-                                                                .ColorBrush = TryCast(a.Resources("AccentColorBrush"), Brush)
-                                                            }
-                                                        End Function).ToList()
+        Me.m_AccentColors = ThemeManager.Current.Themes.GroupBy(Function(x) x.ColorScheme).OrderBy(Function(x) x.Key).Select(Function(x) New AccentColorMenuData() With {.Name = x.Key, .ColorBrush = x.First().ShowcaseBrush, .BorderColorBrush = CType(x.First().Resources("MahApps.Brushes.ThemeBackground"), Brush)}).ToList()
 
         ' create metro theme color menu items for the demo
-        Me.AppThemes = ThemeManager.AppThemes.[Select](Function(a)
-                                                           Return New AppThemeMenuData() With {
-                                                                .Name = a.Name,
-                                                                .BorderColorBrush = TryCast(a.Resources("BlackColorBrush"), Brush),
-                                                                .ColorBrush = TryCast(a.Resources("WhiteColorBrush"), Brush)
-                                                           }
-                                                       End Function).ToList()
+        Me.m_AppThemes = ThemeManager.Current.Themes.GroupBy(Function(x) x.BaseColorScheme).OrderBy(Function(x) x.Key).Select(Function(x) New AppThemeMenuData() With {.Name = x.Key, .BorderColorBrush = CType(x.First().Resources("MahApps.Brushes.ThemeForeground"), Brush), .ColorBrush = CType(x.First().Resources("MahApps.Brushes.ThemeBackground"), Brush)}).ToList()
 
-        Dim ApplicationTheme As Tuple(Of AppTheme, Accent) = ThemeManager.DetectAppStyle(Application.Current)
 
-        For Each at As AppThemeMenuData In Me.AppThemes
-            If (at.Name = ApplicationTheme.Item1.Name) Then
-                TmdSelectedTheme = at
-                Exit For
-            End If
-        Next
+        TmdSelectedTheme = m_AppThemes.Where(Function(x) x.Name = My.Settings.THEME_BASE).FirstOrDefault()
+        AcmdSelectedAccent = m_AccentColors.Where(Function(x) x.Name = My.Settings.THEME_ACCENT).FirstOrDefault()
 
-        For Each ac As AccentColorMenuData In Me.AccentColors
-            If (ac.Name = ApplicationTheme.Item2.Name) Then
-                AcmdSelectedAccent = ac
-                Exit For
-            End If
-        Next
+        WdwAssociated = _WdwAssociated
 
     End Sub
 
@@ -158,7 +140,12 @@ Public Class ViewModelPreferences
         Set(value As AppThemeMenuData)
             If (value IsNot Nothing) Then
                 TmdSelectedTheme = value
-                TmdSelectedTheme.DoChangeTheme(Nothing)
+
+                ThemeManager.Current.ChangeTheme(WdwAssociated, value.Name & "." & SelectedAccent.Name)
+                ThemeManager.Current.ChangeTheme(Application.Current.MainWindow, value.Name & "." & SelectedAccent.Name)
+                ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncAll
+                ThemeManager.Current.SyncTheme()
+
                 My.Settings.THEME_BASE = TmdSelectedTheme.Name
                 My.Settings.Save()
                 OnPropertyChanged()
@@ -173,7 +160,12 @@ Public Class ViewModelPreferences
         Set(value As AccentColorMenuData)
             If (value IsNot Nothing) Then
                 AcmdSelectedAccent = value
-                AcmdSelectedAccent.DoChangeTheme(Nothing)
+
+                ThemeManager.Current.ChangeTheme(WdwAssociated, SelectedTheme.Name & "." & value.Name)
+                ThemeManager.Current.ChangeTheme(Application.Current.MainWindow, SelectedTheme.Name & "." & value.Name)
+                ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncAll
+                ThemeManager.Current.SyncTheme()
+
                 My.Settings.THEME_ACCENT = AcmdSelectedAccent.Name
                 My.Settings.Save()
                 OnPropertyChanged()
@@ -181,22 +173,16 @@ Public Class ViewModelPreferences
         End Set
     End Property
 
-    Public Property AccentColors() As List(Of AccentColorMenuData)
+    Public ReadOnly Property AccentColors() As List(Of AccentColorMenuData)
         Get
             Return m_AccentColors
         End Get
-        Set
-            m_AccentColors = Value
-        End Set
     End Property
 
-    Public Property AppThemes() As List(Of AppThemeMenuData)
+    Public ReadOnly Property AppThemes() As List(Of AppThemeMenuData)
         Get
             Return m_AppThemes
         End Get
-        Set
-            m_AppThemes = Value
-        End Set
     End Property
 
     Public Property NomPromgrammeur As String

@@ -105,7 +105,7 @@ Public Class ViewModelMainWindow
         FrameworkContentElement.LanguageProperty.OverrideMetadata(GetType(System.Windows.Documents.TextElement), New FrameworkPropertyMetadata(lang))
 
         'Gestion du thème - initialisation
-        ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode
+        ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncAll
         ThemeManager.Current.SyncTheme()
 
         ThemeManager.Current.ChangeThemeBaseColor(Application.Current, My.Settings.THEME_BASE)
@@ -449,27 +449,14 @@ Public Class ViewModelMainWindow
 
     Protected Friend Sub CommandAbout(ByVal params As Object)
 
-        strAnEventLogger.writeLog("On veut voir about!", "", EventLogEntryType.Information)
-        Dim bmpImg As New BitmapImage()
 
-        Dim about As New AboutDialogBox.AboutDialogViewModel(My.Application.Info,
-                                                             "EULA",
-                                                             "",
-                                                             "http:\\www.exacad.com",
-                                                             bmpImg,
-                                                             "BaseDark",
-                                                             "Crimson")
-
-        about.ShowDialog()
-
-        about.Dispose()
 
     End Sub
 
     Protected Friend Sub CommandSettings(ByVal params As Object)
         strAnEventLogger.writeLog("On veut voir les préférences!", "", EventLogEntryType.Information)
         Dim pref As New Preferences
-        pref.DataContext = New ViewModelPreferences()
+        pref.DataContext = New ViewModelPreferences(pref)
         pref.ShowDialog()
         pref.Close()
         pref = Nothing
