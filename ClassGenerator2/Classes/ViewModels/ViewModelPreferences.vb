@@ -159,7 +159,7 @@ Public Class ViewModelPreferences
             If (value IsNot Nothing) Then
                 TmdSelectedTheme = value
                 TmdSelectedTheme.DoChangeTheme(Nothing)
-                My.Settings.APPLICATION_THEME = TmdSelectedTheme.Name
+                My.Settings.THEME_BASE = TmdSelectedTheme.Name
                 My.Settings.Save()
                 OnPropertyChanged()
             End If
@@ -174,7 +174,7 @@ Public Class ViewModelPreferences
             If (value IsNot Nothing) Then
                 AcmdSelectedAccent = value
                 AcmdSelectedAccent.DoChangeTheme(Nothing)
-                My.Settings.ACCENT_COLOR = AcmdSelectedAccent.Name
+                My.Settings.THEME_ACCENT = AcmdSelectedAccent.Name
                 My.Settings.Save()
                 OnPropertyChanged()
             End If

@@ -18,11 +18,12 @@
 
 #End Region
 
-Imports MahApps.Metro
+Imports System.ComponentModel
+Imports System.Runtime.CompilerServices
+Imports ControlzEx.Theming
 
 Public Class AppThemeMenuData
-    Inherits AccentColorMenuData
-    Implements IDisposable
+    Implements IDisposable, INotifyPropertyChanged
 
     '************************************************************************************
     '                            V  A  R  I  A  B  L  E  S                              *
@@ -42,6 +43,12 @@ Public Class AppThemeMenuData
     Dim disposed As Boolean = False
 
     'Classe Variables
+
+    Private StrName As String
+    Private BshBorderColorBrush As Brush
+    Private BshColorBrush As Brush
+
+    Private RcChangeAccentCommand As RelayCommand
 
 
 
@@ -115,6 +122,48 @@ Public Class AppThemeMenuData
     '------- --------
     '------- --------
 
+    Public Property Name As String
+        Get
+            Return StrName
+        End Get
+        Set(value As String)
+            StrName = value
+            OnPropertyChanged()
+        End Set
+    End Property
+
+    Public Property BorderColorBrush As Brush
+        Get
+            Return BshBorderColorBrush
+        End Get
+        Set(value As Brush)
+            BshBorderColorBrush = value
+            OnPropertyChanged()
+        End Set
+    End Property
+
+    Public Property ColorBrush As Brush
+        Get
+            Return BshColorBrush
+        End Get
+        Set(value As Brush)
+            BshColorBrush = value
+            OnPropertyChanged()
+        End Set
+    End Property
+
+    Public ReadOnly Property ChangeAccentCommand As ICommand
+        Get
+            If (RcChangeAccentCommand Is Nothing) Then
+                RcChangeAccentCommand = New RelayCommand(AddressOf DoChangeTheme, Function()
+                                                                                      Return True
+                                                                                  End Function)
+            End If
+            Return RcChangeAccentCommand
+        End Get
+    End Property
+
+
 #End Region
 
     '************************************************************************************
@@ -128,17 +177,15 @@ Public Class AppThemeMenuData
     '------- ------
     '------- ------
 
-    Protected Friend Overrides Sub DoChangeTheme(sender As Object)
-        Dim theme As Object = ThemeManager.DetectAppStyle(Application.Current)
-        Dim appTheme As Object = ThemeManager.GetAppTheme(Me.Name)
-        ThemeManager.ChangeAppStyle(Application.Current, theme.Item2, appTheme)
-    End Sub
-
     '------- --------
     '------- --------
     'Section publique
     '------- --------
     '------- --------
+
+    Protected Friend Overridable Sub DoChangeTheme(ByVal params As Object)
+        ThemeManager.Current.ChangeThemeBaseColor(Application.Current, Me.Name)
+    End Sub
 
 #End Region
 
@@ -178,6 +225,8 @@ Public Class AppThemeMenuData
     '------- --------
     '------- --------
 
+    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
+
 #End Region
 
     '************************************************************************************
@@ -196,6 +245,10 @@ Public Class AppThemeMenuData
     'Section publique
     '------- --------
     '------- --------
+
+    Protected Friend Sub OnPropertyChanged(<CallerMemberName()> Optional ByVal propertyName As String = Nothing)
+        RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(propertyName))
+    End Sub
 
 #End Region
 

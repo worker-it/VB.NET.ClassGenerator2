@@ -281,6 +281,10 @@ Public Class ConnectionInfos
         End Get
         Set(value As Long)
             IntDatabaseCatalog = value
+            If (IntDatabaseCatalog >= 0) And (IntDatabaseCatalog < LstListeDesBaseDeDonnees.Count) Then
+                SelectedDB = LstListeDesBaseDeDonnees(IntDatabaseCatalog)
+                OnPropertyChanged("SelectedDB")
+            End If
             BooIsSaved = False
             OnPropertyChanged()
         End Set
@@ -1241,10 +1245,10 @@ Public Class ConnectionInfos
             Case databaseType.SQL_SERVER_LOCALDB
                 If (Me.TrustedConnection) Then
                     'cnctstr = "Server=" & Me.ServerAddressName & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Trusted_Connection=yes;"
-                    cnctstr = "Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" & Me.ServerAddressName & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Integrated Security=True;"
+                    cnctstr = "Data Source=(LocalDB)\" & Me.ServerAddressName & ";" & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Integrated Security=True;"
                 Else
                     'cnctstr = "Server=" & Me.ServerAddressName & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Uid=" & Me.Username & ";Pwd=" & Me.strPassword & ";"
-                    cnctstr = "Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" & Me.ServerAddressName & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Uid=" & Me.Username & ";Pwd=" & Me.strPassword & ";"
+                    cnctstr = "Data Source=(LocalDB)\" & Me.ServerAddressName & ";" & If(WithDatabase, ";Database=" & Me.SelectedDB, "") & ";Uid=" & Me.Username & ";Pwd=" & Me.strPassword & ";"
                 End If
             Case databaseType.ORACLE
                 If (Me.TrustedConnection) Then
@@ -1511,6 +1515,8 @@ Public Class ConnectionInfos
                             Select Case Me.TypeBaseDonnees
                                 Case databaseType.SQL_SERVER
                                     uneClasse &= "Imports System.Data.OleDb" & vbCrLf
+                                Case databaseType.SQL_SERVER_LOCALDB
+                                    uneClasse &= "Imports System.Data" & vbCrLf
                                 Case databaseType.MYSQL
                                     uneClasse &= "Imports MySql.Data.MySqlClient" & vbCrLf
                                 Case databaseType.ORACLE
@@ -2420,7 +2426,7 @@ Public Class ConnectionInfos
                             uneClasse &= getNumberTab(2) & "Try" & vbCrLf
                             uneClasse &= getNumberTab(3) & "aDtr = aCommand.ExecuteReader()" & vbCrLf
                             uneClasse &= getNumberTab(2) & "Catch ex as Exception" & vbCrLf
-                            uneClasse &= getNumberTab(3) & "return = -1" & vbCrLf
+                            uneClasse &= getNumberTab(3) & "return Nothing" & vbCrLf
                             uneClasse &= getNumberTab(2) & "End Try" & vbCrLf
                             uneClasse &= getNumberTab(2) & "" & vbCrLf
                             uneClasse &= getNumberTab(2) & "While aDtr.Read()" & vbCrLf
@@ -2558,7 +2564,7 @@ Public Class ConnectionInfos
                                 uneClasse &= getNumberTab(2) & "Try" & vbCrLf
                                 uneClasse &= getNumberTab(3) & "aDtr = aCommand.ExecuteReader()" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "Catch ex as Exception" & vbCrLf
-                                uneClasse &= getNumberTab(3) & "return = -1" & vbCrLf
+                                uneClasse &= getNumberTab(3) & "return Nothing" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "End Try" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "" & vbCrLf
                                 uneClasse &= getNumberTab(2) & "While aDtr.Read()" & vbCrLf

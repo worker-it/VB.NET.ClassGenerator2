@@ -1,6 +1,6 @@
 ﻿'************************************************************************************
 '* DÉVELOPPÉ PAR :  Jean-Claude Frigon -> 0087378                                   *
-'* DATE :           11/4/2020 1:01:55 PM                                                         *
+'* DATE :           Juin 07                                                         *
 '* MODIFIÉ :                                                                        *
 '* PAR :                                                                            *
 '* DESCRIPTION :                                                                    *
@@ -14,16 +14,12 @@
 '************************************************************************************
 #Region "Library Imports"
 
-Imports System.ComponentModel
-Imports System.Runtime.CompilerServices
-Imports ControlzEx.Theming
 
 
 #End Region
 
-
-Public Class AccentColorMenuData
-    Implements IDisposable, INotifyPropertyChanged
+Public Class UpdateApplication
+    Implements IDisposable
 
     '************************************************************************************
     '                            V  A  R  I  A  B  L  E  S                              *
@@ -40,15 +36,11 @@ Public Class AccentColorMenuData
 
 
     ' Field to handle multiple calls to Dispose gracefully.
-    Private disposed As Boolean = False
+    Dim disposed As Boolean = False
 
     'Classe Variables
 
-    Private StrName As String
-    Private BshBorderColorBrush As Brush
-    Private BshColorBrush As Brush
 
-    Private RcChangeAccentCommand As RelayCommand
 
     '------- --------
     '------- --------
@@ -71,7 +63,6 @@ Public Class AccentColorMenuData
 
         ' Add any initialization after the InitializeComponent() call.
 
-
     End Sub
 
 #End Region
@@ -93,8 +84,6 @@ Public Class AccentColorMenuData
 
         ' Free your own state (unmanaged objects).
         ' Set large fields to null.
-
-
 
     End Sub
 
@@ -123,46 +112,70 @@ Public Class AccentColorMenuData
     '------- --------
     '------- --------
 
-    Public Property Name As String
-        Get
-            Return StrName
-        End Get
-        Set(value As String)
-            StrName = value
-            OnPropertyChanged()
-        End Set
-    End Property
+    Public Shared Sub VersionVerification(Optional ByVal ConfirmationUpToDate As Boolean = False)
 
-    Public Property BorderColorBrush As Brush
-        Get
-            Return BshBorderColorBrush
-        End Get
-        Set(value As Brush)
-            BshBorderColorBrush = value
-            OnPropertyChanged()
-        End Set
-    End Property
+        Dim IfNewVersion As AppVersion = AppVersion.getAppVersionFromID(9)
 
-    Public Property ColorBrush As Brush
-        Get
-            Return BshColorBrush
-        End Get
-        Set(value As Brush)
-            BshColorBrush = value
-            OnPropertyChanged()
-        End Set
-    End Property
+        Dim ToUpdate As Boolean = False
 
-    Public ReadOnly Property ChangeAccentCommand As ICommand
-        Get
-            If (RcChangeAccentCommand Is Nothing) Then
-                RcChangeAccentCommand = New RelayCommand(AddressOf DoChangeTheme, Function()
-                                                                                      Return True
-                                                                                  End Function)
+        If (IfNewVersion.Major > My.Application.Info.Version.Major) Then
+            ToUpdate = True
+        ElseIf (IfNewVersion.Major = My.Application.Info.Version.Major) Then
+
+            If (IfNewVersion.Minor > My.Application.Info.Version.Minor) Then
+                ToUpdate = True
+            ElseIf (IfNewVersion.Minor = My.Application.Info.Version.Minor) Then
+
+                If (IfNewVersion.Build > My.Application.Info.Version.Build) Then
+                    ToUpdate = True
+                ElseIf (IfNewVersion.Build = My.Application.Info.Version.Build) Then
+
+                    If (IfNewVersion.Revision > My.Application.Info.Version.Revision) Then
+                        ToUpdate = True
+                    ElseIf (IfNewVersion.Revision = My.Application.Info.Version.Revision) Then
+
+                        If (ConfirmationUpToDate) Then
+
+                            MsgBox("Vous êtes à jour!", MsgBoxStyle.OkOnly, "Vérification Version")
+
+
+                        End If
+
+                    End If
+                End If
             End If
-            Return RcChangeAccentCommand
-        End Get
-    End Property
+        End If
+
+        If (ToUpdate) Then
+            If (MsgBox("La version actuelle est la suivante :  V" & My.Application.Info.Version.ToString() & "." & vbCrLf &
+                       "Une nouvelle version est disponible (V" & IfNewVersion.ApplicationVersion & ").  Voulez-vous l'installer?", vbYesNo, "Vérification Version") = vbYes) Then
+
+                'Process.Start(IfNewVersion.AppSetupFilePath)
+
+                'Dim fichier As String = "" & IfNewVersion.AppSetupFilePath & ""
+                'If (IO.File.Exists(fichier)) Then
+                '    Dim procInfos As New ProcessStartInfo("""" & IfNewVersion.AppSetupFilePath & """")
+
+                '    procInfos.UseShellExecute = True
+                '    procInfos.WindowStyle = ProcessWindowStyle.Normal
+
+                '    procInfos.Verb = "runas"
+
+                '    Process.Start(procInfos)
+
+                Process.Start("C:\Windows\System32\msiexec.exe", "/i """ & IfNewVersion.AppSetupFilePath.Replace("setup.exe", "GammeDeFabSetup.msi") & """ REINSTALLMODE=amus")
+                Application.Current.MainWindow.Close()
+                'End If
+
+            End If
+
+        ElseIf (ConfirmationUpToDate) Then
+
+            MsgBox("Vous êtes à jour!", MsgBoxStyle.OkOnly, "Vérification Version")
+
+        End If
+
+    End Sub
 
 #End Region
 
@@ -182,11 +195,6 @@ Public Class AccentColorMenuData
     'Section publique
     '------- --------
     '------- --------
-
-    Protected Friend Overridable Sub DoChangeTheme(ByVal params As Object)
-        ThemeManager.Current.ChangeThemeColorScheme(Application.Current, StrName)
-    End Sub
-
 
 #End Region
 
@@ -226,8 +234,6 @@ Public Class AccentColorMenuData
     '------- --------
     '------- --------
 
-    Public Event PropertyChanged As PropertyChangedEventHandler Implements INotifyPropertyChanged.PropertyChanged
-
 #End Region
 
     '************************************************************************************
@@ -246,10 +252,6 @@ Public Class AccentColorMenuData
     'Section publique
     '------- --------
     '------- --------
-
-    Protected Friend Sub OnPropertyChanged(<CallerMemberName()> Optional ByVal propertyName As String = Nothing)
-        RaiseEvent PropertyChanged(Me, New PropertyChangedEventArgs(propertyName))
-    End Sub
 
 #End Region
 

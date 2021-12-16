@@ -18,6 +18,13 @@ Imports System.Collections.ObjectModel
 Imports System.ComponentModel
 Imports System.Runtime.CompilerServices
 Imports ClassGenerator2.Debugging
+Imports ControlzEx.Theming
+Imports MahApps.Metro.Controls
+Imports MahApps.Metro.Controls.Dialogs
+Imports System.Globalization
+Imports System.Threading
+Imports System.Windows.Markup
+
 
 #End Region
 
@@ -82,7 +89,48 @@ Public Class ViewModelMainWindow
         ' Add any initialization after the InitializeComponent() call.
         strAnEventLogger.writeLog("Voilà, c'est un bon début!", "", EventLogEntryType.Information)
 
-        MahApps.Metro.ThemeManager.ChangeAppStyle(Application.Current, MahApps.Metro.ThemeManager.GetAccent(My.Settings.ACCENT_COLOR), MahApps.Metro.ThemeManager.GetAppTheme(My.Settings.APPLICATION_THEME))
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        '@    D E B U T P R O G R A M M E     @
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+        '----------
+        'Force le format "ENGLISH - US" pour date, nombres, etc
+        Dim newCulture As CultureInfo = New CultureInfo("en-US")
+        CultureInfo.DefaultThreadCurrentCulture = newCulture
+        CultureInfo.DefaultThreadCurrentUICulture = newCulture
+        Thread.CurrentThread.CurrentCulture = newCulture
+
+        Dim lang As XmlLanguage = XmlLanguage.GetLanguage(CultureInfo.CurrentCulture.IetfLanguageTag)
+        FrameworkElement.LanguageProperty.OverrideMetadata(GetType(FrameworkElement), New FrameworkPropertyMetadata(lang))
+        FrameworkContentElement.LanguageProperty.OverrideMetadata(GetType(System.Windows.Documents.TextElement), New FrameworkPropertyMetadata(lang))
+
+        'Gestion du thème - initialisation
+        ThemeManager.Current.ThemeSyncMode = ThemeSyncMode.SyncWithAppMode
+        ThemeManager.Current.SyncTheme()
+
+        ThemeManager.Current.ChangeThemeBaseColor(Application.Current, My.Settings.THEME_BASE)
+        ThemeManager.Current.ChangeThemeColorScheme(Application.Current, My.Settings.THEME_ACCENT)
+
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        '@ F I N  D E B U T  P R O G R A M M E@
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        '@     V E R I F.  V E R S I O N      @
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+        Try
+            UpdateApplication.VersionVerification()
+        Catch ex As Exception
+
+        Finally
+
+        End Try
+
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        '@  F I N  V E R I F.  V E R S I O N  @
+        '@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 
         LstListeDesConnections.Insert(0, New ConnectionInfos(Me))
         ConnectionSelectionnee = LstListeDesConnections(0)
@@ -115,6 +163,11 @@ Public Class ViewModelMainWindow
 
         LstListeDesConnections = Nothing
 
+        Try
+            RemoveHandler CiSelectedConnection.PropertyChanged, AddressOf ConnectionInfosPropertyChanged
+        Catch ex As Exception
+
+        End Try
 
     End Sub
 
@@ -163,7 +216,18 @@ Public Class ViewModelMainWindow
 
             strAnEventLogger.writeLog("Propriété ConnectionSelectionnee!", "", EventLogEntryType.Information)
 
-            CiSelectedConnection = value
+            If (value IsNot Nothing) Then
+
+                CiSelectedConnection = value
+
+            Else
+
+                CiSelectedConnection = New ConnectionInfos(Me)
+                AddHandler CiSelectedConnection.PropertyChanged, AddressOf ConnectionInfosPropertyChanged
+
+            End If
+
+
 
             RcRetrieveDB = New RelayCommand(AddressOf CiSelectedConnection.BtnRetrieveDbsCommand, Function()
                                                                                                       Return True
@@ -178,6 +242,7 @@ Public Class ViewModelMainWindow
             OnPropertyChanged("RetrieveDBs")
             OnPropertyChanged("RetrieveDBInfos")
             OnPropertyChanged("CreateFiles")
+            OnPropertyChanged("AdresseNomServeurOuNomInstance")
             OnPropertyChanged()
         End Set
     End Property
@@ -224,6 +289,21 @@ Public Class ViewModelMainWindow
                     Return Visibility.Hidden
                 Case Else
                     Return Visibility.Visible
+            End Select
+        End Get
+    End Property
+
+    Public ReadOnly Property AdresseNomServeurOuNomInstance As String
+        Get
+            Select Case CiSelectedConnection.TypeBaseDonnees
+                Case ConnectionInfos.databaseType.FLAT_FILE, ConnectionInfos.databaseType.MS_ACCESS_2007_2019, ConnectionInfos.databaseType.MS_ACCESS_97_2003, ConnectionInfos.databaseType.MS_EXCEL
+                    Return "Nom du fichier :"
+                Case ConnectionInfos.databaseType.MYSQL, ConnectionInfos.databaseType.ORACLE, ConnectionInfos.databaseType.POSTGRE_SQL, ConnectionInfos.databaseType.SQL_SERVER
+                    Return "Nom ou Adresse IP du serveur :"
+                Case ConnectionInfos.databaseType.SQL_SERVER_LOCALDB
+                    Return "Nom de l'instance :"
+                Case Else
+                    Return ""
             End Select
         End Get
     End Property
@@ -350,6 +430,17 @@ Public Class ViewModelMainWindow
     'Section privée
     '------- ------
     '------- ------
+
+    Private Sub ConnectionInfosPropertyChanged(ByVal sender As Object, ByVal e As PropertyChangedEventArgs)
+
+        Select Case e.PropertyName
+            Case "TypeBaseDonnees"
+                OnPropertyChanged("AdresseNomServeurOuNomInstance")
+            Case Else
+
+        End Select
+
+    End Sub
 
     Protected Friend Sub OnPropertyChanged(<CallerMemberName()> Optional ByVal propertyName As String = Nothing)
         'MsgBox(propertyName & vbCrLf & ViewModelPeriodeDePaie.instance & vbCrLf & "Lecture :" & Employes.LectureDePropriete & vbCrLf & "Ecriture :" & Employes.EcriturePropriete & vbCrLf & "Fonction :" & ViewModelPeriodeDePaie.AppelDeFonction)

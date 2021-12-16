@@ -56,24 +56,24 @@ Partial Friend NotInheritable Class MySettings
     <Global.System.Configuration.UserScopedSettingAttribute(),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
      Global.System.Configuration.DefaultSettingValueAttribute("Crimson")>  _
-    Public Property ACCENT_COLOR() As String
+    Public Property THEME_ACCENT() As String
         Get
-            Return CType(Me("ACCENT_COLOR"),String)
+            Return CType(Me("THEME_ACCENT"),String)
         End Get
         Set
-            Me("ACCENT_COLOR") = value
+            Me("THEME_ACCENT") = value
         End Set
     End Property
     
     <Global.System.Configuration.UserScopedSettingAttribute(),  _
      Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-     Global.System.Configuration.DefaultSettingValueAttribute("BaseDark")>  _
-    Public Property APPLICATION_THEME() As String
+     Global.System.Configuration.DefaultSettingValueAttribute("Dark")>  _
+    Public Property THEME_BASE() As String
         Get
-            Return CType(Me("APPLICATION_THEME"),String)
+            Return CType(Me("THEME_BASE"),String)
         End Get
         Set
-            Me("APPLICATION_THEME") = value
+            Me("THEME_BASE") = value
         End Set
     End Property
     
